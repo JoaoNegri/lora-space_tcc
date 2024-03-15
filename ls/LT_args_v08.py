@@ -61,10 +61,10 @@ else:
     
     multi_nodes = [int(sys.argv[7]), int(sys.argv[8]) ,int(sys.argv[9]), int(sys.argv[10]),int(sys.argv[11]),int(sys.argv[12]),int(sys.argv[13]),int(sys.argv[14]),int(sys.argv[15]),int(sys.argv[16]),int(sys.argv[17]),int(sys.argv[18]),int(sys.argv[19]),int(sys.argv[20])]
 
-random.seed(RANDOM_SEED) #RANDOM SEED IS FOR GENERATE ALWAYS THE SAME RANDOM NUMBERS (ie SAME RESULTS OF SIMULATION)
+random.seed() #RANDOM SEED IS FOR GENERATE ALWAYS THE SAME RANDOM NUMBERS (ie SAME RESULTS OF SIMULATION)
 nodesToSend = []
 packetsToSend = math.ceil(total_data/packetlen)
-
+print(packetsToSend)
 ###GLOBAL PARAMS ####
 bsId = 1 ##ID OF BASE STATION (NOT USED)
 channel = [0,1,2] ##NOT USED BY NOW
@@ -542,7 +542,7 @@ def simulate_scenario (nrNodes):
             i=i+1
             print ("{:3.5f} || ***A new beacon has been sended from Satellite***".format(env.now))
             yield env.timeout(2)
-            logs.append("{:3.3f},B,{}".format(env.now,nodesToSend))
+            # logs.append("{:3.3f},B,{}".format(env.now,nodesToSend))
             nodesToSend = []    
         
     env.process(beacon(env)) ##BEACON SENDER
@@ -556,7 +556,8 @@ def simulate_scenario (nrNodes):
     env.run(until=600*2)
     
     sent = sum(n.sent for n in nodes)
-    
+    print('-------------',sent,nrCollisions,nrLost,nrProcessed,nrReceived)
+    print(logs)
     return ([sent,nrCollisions,nrLost,nrProcessed,nrReceived],logs)
 
 
