@@ -12,36 +12,36 @@ import numpy as np
 # plt.style.use('ieee')
 
 
-folders = os.listdir('../resultados_simulacao_30_random')
+folders = os.listdir('../aaaa')
 
 dfs =[]
 
 # cada tipo de simulador
 for folder in folders:
 
-    iteracao = os.listdir('../resultados_simulacao_30_random/'+folder)
+    iteracao = os.listdir('../aaaa/'+folder)
     node = []
     percentual = []
     i=0
     df = pd.DataFrame
     # cada parametro de simulaçao
     for it in iteracao:
-        files = os.listdir('../resultados_simulacao_30_random/'+folder+'/'+it)
+        files = os.listdir('../aaaa/'+folder+'/'+it)
         #cada simulação
         for file in files:
-            sim = pd.read_csv('../resultados_simulacao_30_random/'+folder+'/'+it+'/'+file, names=['timestamp','id','dist','elev','SF','status'])
+            sim = pd.read_csv('../aaaa/'+folder+'/'+it+'/'+file, names=['timestamp','id','dist','elev','SF','status'])
 
             node.append(int(file.split('_')[1]))
 
             processed = len(sim[sim['status']=='PE']) # mensagens recebidas com sucesso
             num_packet = len(sim['status']) # Total de transmissão
-            
+            # print(sim)
             percentual.append(processed/num_packet)
-            if ('1568' in file and '3000' in file )| ('1627' in file and '3000' in file ):
-                print(f'file = {file}')
-                print('processed = ',processed)
-                print('num_packet = ',num_packet)
-                print(f'prob = {processed/num_packet}')
+            # if ('1568' in file and '3000' in file )| ('1627' in file and '3000' in file ):
+            #     print(f'file = {file}')
+            #     print('processed = ',processed)
+            #     print('num_packet = ',num_packet)
+            #     print(f'prob = {processed/num_packet}')
 
         if df.empty:
             data = {'num_nodes'+folder+'0' : node, 'percentual'+folder+'0' : percentual}
@@ -52,9 +52,9 @@ for folder in folders:
             data = {'num_nodes'+folder+str(i) : node, 'percentual'+folder+str(i) : percentual}
             
             df2 = pd.DataFrame(data)
-            print(df2)
+            # print(df2)
             df2 = df2.sort_values('num_nodes'+folder+str(i))            
-            print(df2)
+            # print(df2)
             df2.reset_index(inplace=True,drop=True)
             df['num_nodes'+folder+str(i)] = df2['num_nodes'+folder+str(i)]
             df['percentual'+folder+str(i)] = df2['percentual'+folder+str(i)]
@@ -80,35 +80,35 @@ for item in dfs:
         pass
 
 
-    soma = 12.71*(desvio_padrao_por_linha/np.sqrt(30)) #intervalo de confiança
+    soma = 2.45*(desvio_padrao_por_linha/np.sqrt(30)) #intervalo de confiança
 
 
-    if 'percentualLB12'  in item.columns:
+    if 'percentualLB0'  in item.columns:
         label = 'lora conservative'
         plt.plot(item[colunas_num_nodes[0]],media, label=label)
         plt.fill_between(item[colunas_num_nodes[0]], media-soma, media+soma, alpha=0.3)
 
-    elif 'percentualLR12' in item.columns:
+    elif 'percentualLR0' in item.columns:
         label = 'lora random'
         plt.plot(item[colunas_num_nodes[0]],media, label=label)
         plt.fill_between(item[colunas_num_nodes[0]], media-soma, media+soma, alpha=0.3)
 
-    elif 'percentualLT12'  in item.columns:
+    elif 'percentualLT0'  in item.columns:
         label = 'lora trajectory'
         plt.plot(item[colunas_num_nodes[0]],media, label=label)
         plt.fill_between(item[colunas_num_nodes[0]], media-soma, media+soma, alpha=0.3)
 
 
-    elif 'percentualLTb12'  in item.columns:
+    elif 'percentualLTb0'  in item.columns:
         label = 'Trajectory skip'
         plt.plot(item[colunas_num_nodes[0]],media, label=label)
         plt.fill_between(item[colunas_num_nodes[0]], media-soma, media+soma, alpha=0.3)
-    elif 'percentualLTbr12'  in item.columns:
+    elif 'percentualLTbr0'  in item.columns:
         label = 'lora trajectory random skip'
         plt.plot(item[colunas_num_nodes[0]],media, label=label)
         plt.fill_between(item[colunas_num_nodes[0]], media-soma, media+soma, alpha=0.3)
 
-    elif 'percentualLTr12'  in item.columns:
+    elif 'percentualLTr0'  in item.columns:
         label = 'lora trajectory random'
         plt.plot(item[colunas_num_nodes[0]],media, label=label)
         plt.fill_between(item[colunas_num_nodes[0]], media-soma, media+soma, alpha=0.3)

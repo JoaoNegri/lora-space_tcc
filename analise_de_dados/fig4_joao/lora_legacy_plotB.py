@@ -12,14 +12,14 @@ import numpy as np
 # plt.style.use('science')
 
 
-folders = os.listdir('../resultados_simulacao_30_random')
+folders = os.listdir('../aaaa')
 
 dfs =[]
 
 # cada tipo de simulador
 for folder in folders:
 
-    iteracao = os.listdir('../resultados_simulacao_30_random/'+folder)
+    iteracao = os.listdir('../aaaa/'+folder)
     node = []
     percentual = []
 
@@ -33,10 +33,10 @@ for folder in folders:
     df = pd.DataFrame
     # cada parametro de simulaçao
     for it in iteracao:
-        files = os.listdir('../resultados_simulacao_30_random/'+folder+'/'+it)
+        files = os.listdir('../aaaa/'+folder+'/'+it)
         #cada simulação
         for file in files:
-            sim = pd.read_csv('../resultados_simulacao_30_random/'+folder+'/'+it+'/'+file, names=['timestamp','id','dist','elev','SF','status'])
+            sim = pd.read_csv('../aaaa/'+folder+'/'+it+'/'+file, names=['timestamp','id','dist','elev','SF','status'])
 
             node.append(int(file.split('_')[1]))
 

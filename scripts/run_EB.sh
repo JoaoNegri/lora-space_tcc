@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Defina o diretório onde estão os arquivos Python
-diretorio="es"
+diretorio="../antigos_simuladores/es"
 
 # Verifica se o diretório existe
 if [ ! -d "$diretorio" ]; then

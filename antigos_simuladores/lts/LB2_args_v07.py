@@ -33,15 +33,15 @@ import os
 import datetime
 import sys
 
-name = "LT"
+name = "LB2"
 mode_debbug = 0
+####WE START BY USING SF=12 ADN BW=125 AND CR=1, FOR ALL NODES AND ALL TRANSMISIONS######
 
 if not mode_debbug:
     null = open(os.devnull, 'w')
     old_stdout = sys.stdout
     sys.stdout = null
 
-####WE START BY USING SF=12 ADN BW=125 AND CR=1, FOR ALL NODES AND ALL TRANSMISIONS######
 
 if mode_debbug:
     RANDOM_SEED = 5
@@ -61,16 +61,16 @@ else:
     
     multi_nodes = [int(sys.argv[7]), int(sys.argv[8]) ,int(sys.argv[9]), int(sys.argv[10]),int(sys.argv[11]),int(sys.argv[12]),int(sys.argv[13]),int(sys.argv[14]),int(sys.argv[15]),int(sys.argv[16]),int(sys.argv[17]),int(sys.argv[18]),int(sys.argv[19]),int(sys.argv[20])]
 
-random.seed() #RANDOM SEED IS FOR GENERATE ALWAYS THE SAME RANDOM NUMBERS (ie SAME RESULTS OF SIMULATION)
+
+random.seed(RANDOM_SEED) #RANDOM SEED IS FOR GENERATE ALWAYS THE SAME RANDOM NUMBERS (ie SAME RESULTS OF SIMULATION)
 nodesToSend = []
 packetsToSend = math.ceil(total_data/packetlen)
-print(packetsToSend)
+
+
 ###GLOBAL PARAMS ####
 bsId = 1 ##ID OF BASE STATION (NOT USED)
-channel = [0,1,2] ##NOT USED BY NOW
 
 avgSendTime = 3  ## NOT USED! --> A NODE SENDS A PACKET EVERY X SECS
-
 
 back_off = beacon_time * 0.95 ###BACK OFF TIME FOR SEND A PACKET
 packetsAtBS = [] ##USED FOR CHEK IF THERE ARE ALREADY PACKETS ON THE SATELLITE
@@ -81,6 +81,7 @@ G_sat = 12;   ##ANTENNA GAIN FOR SATELLITE
 nodes = [] ###EACH NODE WILL BE APPENDED TO THIS VARIABLE
 freq =868e6 ##USED FOR PATH LOSS CALCULATION
 frequency = [868100000, 868300000, 868500000] ##FROM LORAWAN REGIONAL PARAMETERS EU863-870 / EU868
+
 
 nrLost = 0 ### TOTAL OF LOST PACKETS DUE Lpl
 nrCollisions = 0 ##TOTAL OF COLLIDED PACKETS
@@ -106,9 +107,9 @@ sf12 = np.array([12,-137,-134,-131.0])
 
 sensi = np.array([sf7,sf8,sf9,sf10,sf11,sf12])
 
+## READ PARAMS FROM DIRECTORY ##
 path = "./wider_scenario_2/"
 
-### -137dB IS THE MINIMUN TOLERABLE SENSIBILITY, FOR SF=12 AND BW=125KHz ###
 
 leo_pos=np.loadtxt( path + "LEO-XYZ-Pos.csv",skiprows=1,delimiter=',',usecols=(1,2,3))
 ## WHERE:
@@ -121,6 +122,7 @@ sites_pos = np.loadtxt( path + "SITES-XYZ-Pos.csv",skiprows=1,delimiter=',',usec
     ## sites_pos[i,j]:
         ## i --> the node i
         ## j --> 0 for x-position, 1 for y-position, 2 for z-position
+
 
 dist_sat = np.zeros((sites_pos.shape[0],3,leo_pos.shape[0]))
 t = 0
@@ -156,6 +158,7 @@ Prx = Ptx + G_sat + G_device -20*np.log10(distance*1000) - 20*np.log10(freq) + 1
     ## Prx[i,j]:
         ## i --> the node i
         ## j --> the step time in sat pass 
+
 distance = np.concatenate((distance,distance,distance,distance,distance,distance,distance,distance,distance,distance,distance,distance,distance,distance,distance,distance,distance,distance,distance,distance))
 Lpl = np.concatenate((Lpl,Lpl,Lpl,Lpl,Lpl,Lpl,Lpl,Lpl,Lpl,Lpl,Lpl,Lpl,Lpl,Lpl,Lpl,Lpl,Lpl,Lpl,Lpl,Lpl))
 Prx = np.concatenate((Prx,Prx,Prx,Prx,Prx,Prx,Prx,Prx,Prx,Prx,Prx,Prx,Prx,Prx,Prx,Prx,Prx,Prx,Prx,Prx))
@@ -240,7 +243,9 @@ def simulate_scenario (nrNodes):
                    print( "p2 is lost")
                    Collmap[p2.sf-7][p1.sf-7] += 1
                    return (p1,p2)
-        
+    
+    
+       
     def timingCollision(p1, p2):
         # assuming p1 is the freshly arrived packet and this is the last check
         # we've already determined that p1 is a weak packet, so the only
@@ -333,7 +338,6 @@ def simulate_scenario (nrNodes):
         print ("{:3.5f} || >> No SF Collision!".format(env.now))
         return False
     
-     
     def powerCollision(p1, p2):
         powerThreshold = 6 # dB
         print ("{:3.5f} || power: node {} {:3.2f} dBm, node {} {:3.2f}; diff is {}dBm".format(env.now,p1.nodeid,p1.rssi[math.ceil(env.now)],p2.nodeid, p2.rssi[math.ceil(env.now)], round(p1.rssi[math.ceil(env.now)] - p2.rssi[math.ceil(env.now)],2)))
@@ -361,9 +365,10 @@ def simulate_scenario (nrNodes):
             self.elev = elev[nodeid,:]
             self.mindist = np.amin(distance[nodeid,:])
             self.mindist_pos = int(np.where(distance[nodeid,:] == np.amin(distance[nodeid,:]))[0])
-          
+            #print('node %d' %nodeid, "dist: ", self.dist[0])
             self.buffer = total_data
             self.packetlen = packetlen
+            #self.ch = int(random.choice(channel)) 
             self.packet = myPacket(self.nodeid, packetlen, self.dist)
             self.sent = 0 #INITIAL SENT PACKETS
             self.totalLost = 0 #INITIAL TOTAL LOST FOR PARTICULAR NODE
@@ -381,13 +386,12 @@ def simulate_scenario (nrNodes):
             global distance
             global channel
             global frequency
+                
             self.nodeid = nodeid
             self.txpow = Ptx
-            #self.sf = random.choice(SF)
             self.sf = 12
             self.cr = 1 ##CODING RATE
-            self.bw = 125
-    
+            self.bw = 125    
             # transmission range, needs update XXX
             self.transRange = 150
             self.pl = packetlen
@@ -419,35 +423,10 @@ def simulate_scenario (nrNodes):
     
         Tsym = (2.0**sf)/bw
         Tpream = (Npream + 4.25)*Tsym
-        #print ("PARAMS FOR TRANSMISION: sf", sf, " cr", cr, "pl", pl, "bw", bw)
         payloadSymbNB = 8 + max(math.ceil((8.0*pl-4.0*sf+28+16-20*H)/(4.0*(sf-2*DE)))*(cr+4),0)
         Tpayload = payloadSymbNB * Tsym
         return ((Tpream + Tpayload)/1000) ##IN SECS
     
-    def selectSF (env, node):
-        global sf7,sf8,sf9,sf10,sf11,sf12 
-        rssi = node.packet.rssi[math.ceil(env.now)]
-        #print ("{:3.5f} || RSSI for node {} is {} dB...".format(env.now,node.nodeid,rssi))
-        if rssi > sf7[1]:
-            #print ("----Select SF7")
-            node.packet.sf = 7
-        elif rssi > sf8[1]:
-            #print ("----Select SF8")
-            node.packet.sf = 8  
-        elif rssi > sf9[1]:
-            #print ("----Select SF9")
-            node.packet.sf = 9
-        elif rssi > sf10[1]:
-            #print ("----Select SF10")
-            node.packet.sf = 10
-        elif rssi > sf11[1]:
-            #print ("----Select SF11")
-            node.packet.sf = 11
-        else:
-            #print ("----Select S12")
-            node.packet.sf = 12
-            
-
     
     def transmit(env,node):
         global wait_min
@@ -462,7 +441,7 @@ def simulate_scenario (nrNodes):
             if node in packetsAtBS:
                 print ("{:3.5f} || ERROR: packet is already in...".format(env.now))
             else:
-                sensibility = sensi[12 - 7, [125,250,500].index(node.packet.bw) + 1]
+                sensibility = sensi[node.packet.sf - 7, [125,250,500].index(node.packet.bw) + 1]
                 if node.packet.rssi[math.ceil(env.now)] < sensibility: #HERE WE ARE CONSIDERING RSSI AT TIME ENV.NOW
                     print ("{:3.5f} || Node {}: Can not reach beacon due Lpl".format(env.now,node.nodeid))
                     wait =0 ##LETS WAIT FOR NEXT BEACON
@@ -471,11 +450,13 @@ def simulate_scenario (nrNodes):
     
                 else:
                     nodesToSend.append(node.nodeid)
+                    
                     wait = random.uniform(1,back_off - node.packet.rectime - float(node.packet.proptime[math.ceil(env.now)])) ##TRIGGER BACK-OFF TIME
                     yield env.timeout(wait)
+                    
                     print ("{:3.5f} || Node {} begins to transmit a packet".format(env.now,node.nodeid))
-                    selectSF(env,node) ##CHOOSE SF
                     trySend = True
+                    node.sent = node.sent + 1
                     node.buffer = node.buffer - node.packetlen
                     if node in packetsAtBS:
                         print ("{} || ERROR: packet is already in...".format(env.now))
@@ -484,12 +465,8 @@ def simulate_scenario (nrNodes):
                         if node.packet.rssi[math.ceil(env.now)] < sensibility: #HERE WE ARE CONSIDERING RSSI AT TIME ENV.NOW
                             print ("{:3.5f} || Node {}: The Packet will be Lost due Lpl".format(env.now,node.nodeid))
                             node.packet.lost = True ## LOST ONLY CONSIDERING Lpl
-                            #trySend = False
                         else:
                             node.packet.lost = False ## LOST ONLY CONSIDERING Lpl
-                            #trySend = True
-                            node.sent = node.sent + 1
-                            #node.buffer = node.buffer - node.packetlen
                             print ("{:3.5f} || Prx for node {} is {:3.2f} dB".format(env.now, node.nodeid, node.packet.rssi[math.ceil(env.now)]))
                             #print ("Prx for node",node.nodeid, "is: ",node.packet.rssi[math.ceil(env.now)],"at time",env.now)
                             print ("{:3.5f} || Let's try if there are collisions...".format(env.now))
@@ -501,7 +478,6 @@ def simulate_scenario (nrNodes):
                             packetsAtBS.append(node)
                             node.packet.addTime = env.now
                             yield env.timeout(node.packet.rectime)
-                        
             
             if trySend == 1:
                 if node.packet.lost:
@@ -513,6 +489,7 @@ def simulate_scenario (nrNodes):
                 else:
                     logs.append("{:3.3f},{},{:3.3f},{:3.3f},{},PE".format(env.now,node.nodeid,node.dist[math.ceil(env.now)],node.elev[math.ceil(env.now)],node.packet.sf))
             
+            
             # complete packet has been received by base station
             # Let's remove from Base Station
             if (node in packetsAtBS):
@@ -521,7 +498,6 @@ def simulate_scenario (nrNodes):
             node.packet.collided = 0
             node.packet.processed = 0
             node.packet.lost = False
-            node.packet.sf = 12
             
             #yield env.timeout(beacon_time-wait-node.packet.rectime)
             if trySend:
@@ -529,6 +505,7 @@ def simulate_scenario (nrNodes):
             else:
                 yield env.timeout(beacon_time-wait-node.packet.rectime)
                           
+                    
     def beacon (env):
         global beacon_time
         global nodesToSend
@@ -543,8 +520,11 @@ def simulate_scenario (nrNodes):
             print ("{:3.5f} || ***A new beacon has been sended from Satellite***".format(env.now))
             yield env.timeout(2)
             # logs.append("{:3.3f},B,{}".format(env.now,nodesToSend))
-            nodesToSend = []    
+            nodesToSend = []
         
+    
+               
+    
     env.process(beacon(env)) ##BEACON SENDER
     
     ### THIS IS GOING TO CREATE NODES AND DO TRAMSMISIONS. IS THE MAIN PROGRAM ###
@@ -553,13 +533,15 @@ def simulate_scenario (nrNodes):
         nodes.append(node)
         env.process(transmit(env,node))
         
+    
     env.run(until=600*2)
     
     sent = sum(n.sent for n in nodes)
-    print('-------------',sent,nrCollisions,nrLost,nrProcessed,nrReceived)
-    print(logs)
+    
     return ([sent,nrCollisions,nrLost,nrProcessed,nrReceived],logs)
 
+
+#multi_nodes = [5]
 
 #############################################################
 if chan == 1:
@@ -600,10 +582,10 @@ if chan == 1:
         nrProcessed = 0 ##TOTAL OF PROCESSED PACKETS
         nrReceived = 0 ###TOTAL OF RECEIVED PACKETS
 
-#############################################################
 
+#############################################################
+###SCENARIO 3 CHANNELS###
 if chan == 3:
-    ###SCENARIO 3 CHANNELS###
     frequency = [868100000, 868300000, 868500000] ##FROM LORAWAN REGIONAL PARAMETERS EU863-870 / EU868
     
     nodes = [] ###EACH NODE WILL BE APPENDED TO THIS VARIABLE
@@ -639,6 +621,9 @@ if chan == 3:
         nrProcessed = 0 ##TOTAL OF PROCESSED PACKETS
         nrReceived = 0 ###TOTAL OF RECEIVED PACKETS
 
+
 if not mode_debbug:
     sys.stdout = old_stdout
-    print("done LT")
+    print("done LB2")
+
+

@@ -38,8 +38,8 @@ mode_debbug = 0
 
 if not mode_debbug:
     null = open(os.devnull, 'w')
-    # old_stdout = sys.stdout
-    # sys.stdout = null
+    old_stdout = sys.stdout
+    sys.stdout = null
 ####WE START BY USING SF=12 ADN BW=125 AND CR=1, FOR ALL NODES AND ALL TRANSMISIONS######
 
 if mode_debbug:
@@ -853,7 +853,7 @@ if chan ==3:
         nrReceivedIntra = 0 ##TOTAL OF RECEIVED INTRA-PACKETS
 
 if not mode_debbug:
-    # sys.stdout = old_stdout
+    sys.stdout = old_stdout
     print("done ",name)
 
 
