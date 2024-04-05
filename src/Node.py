@@ -5,7 +5,7 @@ from Intrapacket import IntraPacket
 from Header import Header
 
 class Node():
-    def __init__(self, nodeid, bs, avgSendTime, packetlen, total_data, distance, elev, channel, Ptx, Prx, frequency):
+    def __init__(self, nodeid, bs, avgSendTime, packetlen, total_data, distance, channel, Ptx, Prx, frequency):
         global DR
         self.dr = 8
         #carriers = list(range(280))
@@ -14,14 +14,11 @@ class Node():
         self.avgSendTime = avgSendTime
         self.bs = bs
         self.dist = distance[nodeid%len(distance),:]
-        self.elev = elev[nodeid%len(elev),:]
-        self.mindist = np.amin(distance[nodeid%len(distance),:])
-        self.mindist_pos = int(np.where(distance[nodeid%len(distance),:] == np.amin(distance[nodeid%len(distance),:]))[0])
         #print('node %d' %nodeid, "dist: ", self.dist[0])
         self.buffer = total_data
         self.packetlen = packetlen
         self.ch = int(random.choice(channel)) 
-        self.packet = Packet(self.nodeid, packetlen, self.dist, Ptx, Prx, frequency, distance)
+        # self.packet = Packet(self.nodeid, packetlen, self.dist, Ptx, Prx, frequency, distance)
         #self.freqHop = carriers[0:35]
         self.sent = 0 #INITIAL SENT PACKETS
         self.totalLost = 0 #INITIAL TOTAL LOST FOR PARTICULAR NODE
@@ -45,5 +42,5 @@ class Node():
             random.shuffle(carriers) #TO CHOOSE THE HOPPING JUMPS
             self.freqHop = carriers[0:86]
         
-        self.header = Header(self.nodeid,self.dist,self.ch,self.freqHop, self.dr, Prx, Ptx, distance)
-        self.intraPacket = IntraPacket(self.nodeid,self.dist,self.ch,self.freqHop,self.dr, Prx, Ptx, distance)
+        self.header = Header(self.nodeid,self.dist,self.ch,self.freqHop, self.dr, Prx, Ptx, distance, packetlen, frequency)
+        self.intraPacket = IntraPacket(self.nodeid,self.dist,self.ch,self.freqHop,self.dr, Prx, Ptx, distance, packetlen, frequency)

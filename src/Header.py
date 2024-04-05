@@ -1,12 +1,14 @@
-class Header ():
-    def __init__(self,nodeid,dist,ch,freqHop,dr, Prx, Ptx, distance):
+from Packet import Packet
+class Header (Packet):
+    def __init__(self,nodeid,dist,ch,freqHop,dr, Prx, Ptx, distance, packetlen, frequency):
         global channel
-        global frequency
+        
+        super().__init__(nodeid, packetlen, dist, Ptx, Prx, frequency, distance)
+
         self.nodeid = nodeid
         self.txpow = Ptx
         self.transRange = 150
         self.arriveTime = 0
-        self.rssi = Prx[nodeid%len(Prx),:]
         self.rectime = 0.233
         #self.rectime = 1.5
         print(distance)
@@ -14,7 +16,6 @@ class Header ():
         c = 299792.458 ###SPEED LIGHT [km/s]
 
 
-        self.proptime = distance[nodeid%len(distance),:]*(1/c)
         self.collided = 0
         self.noCollided = 0
         self.processed = 0
