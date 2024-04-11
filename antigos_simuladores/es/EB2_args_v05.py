@@ -113,7 +113,7 @@ sensi = np.array([sf7,sf8,sf9,sf10,sf11,sf12])
 DR = [-137,-134.5,-134,-131.5]
 
 ## READ PARAMS FROM DIRECTORY ##
-path = "./wider_scenario_2/"
+path = "../../params/wider_scenario_2/"
 
 ### -137dB IS THE MINIMUN TOLERABLE SENSIBILITY, FOR SF=12 AND BW=125KHz ###
 
