@@ -6,15 +6,13 @@ class Header ():
         self.txpow = Ptx
         self.transRange = 150
         self.arriveTime = 0
-        self.rssi = Prx[nodeid%len(Prx),:]
+        self.rssi = Prx[nodeid%len(Prx),:,:]
         self.rectime = 0.233
         #self.rectime = 1.5
-        print(distance)
-
         c = 299792.458 ###SPEED LIGHT [km/s]
 
 
-        self.proptime = distance[nodeid%len(distance),:]*(1/c)
+        self.proptime = distance[nodeid%len(distance),:,:]*(1/c)
         self.collided = 0
         self.noCollided = 0
         self.processed = 0

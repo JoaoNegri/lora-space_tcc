@@ -17,14 +17,16 @@ def powerCollision_2(p1, p2, env):
     #print ("SF: node {} has {} ; node {} has {}".format(p1.nodeid,p1.sf, p2.nodeid, p2.sf))
     #print ("pwr: node {} with rssi {} dBm and node {} with rssi {} dBm; diff {:3.2f} dBm".format(p1,p1.rssi[math.ceil(env.now)], p2.nodeid,p2.rssi[math.ceil(env.now)], p1.rssi[math.ceil(env.now)] - p2.rssi[math.ceil(env.now)]))
     if True: #p1.sf == p2.sf:
-        if abs(p1.rssi[math.ceil(env.now)] - p2.rssi[math.ceil(env.now)]) < IsoThresholds[p1.dr-8][p2.dr-8]:
+        if abs(p1.rssi[0][math.ceil(env.now)] - p2.rssi[0][math.ceil(env.now)]) < IsoThresholds[p1.dr-8][p2.dr-8]:
+            #TODO VERIFICAR O 0 !!!!!!!!!!!!!!!!!
             print ("collision pwr both node {} and node {}".format(p1.nodeid, p2.nodeid))
             #Collmap[p1.sf-7][p2.sf-7] += 1
             #Collmap[p2.sf-7][p1.sf-7] += 1
             # packets are too close to each other, both collide
             # return both packets as casualties
             return (p1, p2)
-        elif p1.rssi[math.ceil(env.now)] - p2.rssi[math.ceil(env.now)] < IsoThresholds[p1.dr-8][p2.dr-8]:
+        elif p1.rssi[0][math.ceil(env.now)] - p2.rssi[0][math.ceil(env.now)] < IsoThresholds[p1.dr-8][p2.dr-8]:
+            #TODO VERIFICAR O 0 !!!!!!!!!!!!!!!!!
             # p2 overpowered p1, return p1 as casualty
             print ("collision pwr node {} overpowered node {}".format(p2.nodeid, p1.nodeid))
             print ("capture - p2 wins, p1 lost")

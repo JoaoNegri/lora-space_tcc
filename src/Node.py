@@ -13,11 +13,8 @@ class Node():
         self.nodeid = nodeid
         self.avgSendTime = avgSendTime
         self.bs = bs
-        self.dist = distance[nodeid%len(distance),:]
-        self.elev = elev[nodeid%len(elev),:]
-        self.mindist = np.amin(distance[nodeid%len(distance),:])
-        self.mindist_pos = int(np.where(distance[nodeid%len(distance),:] == np.amin(distance[nodeid%len(distance),:]))[0])
-        #print('node %d' %nodeid, "dist: ", self.dist[0])
+        self.dist = distance[nodeid%len(distance),:,:]
+        self.elev = elev[nodeid%len(elev),:,:]
         self.buffer = total_data
         self.packetlen = packetlen
         self.ch = int(random.choice(channel)) 
