@@ -60,7 +60,6 @@ else:
     
     #multi_nodes = [int(sys.argv[7]), int(sys.argv[8]) ,int(sys.argv[9])]
     multi_nodes = [int(sys.argv[7]), int(sys.argv[8]) ,int(sys.argv[9]), int(sys.argv[10]),int(sys.argv[11]),int(sys.argv[12]),int(sys.argv[13]),int(sys.argv[14]),int(sys.argv[15]),int(sys.argv[16]),int(sys.argv[17]),int(sys.argv[18]),int(sys.argv[19]),int(sys.argv[20])]
-random.seed(RANDOM_SEED) #RANDOM SEED IS FOR GENERATE ALWAYS THE SAME RANDOM NUMBERS (ie SAME RESULTS OF SIMULATION)
 nodesToSend = []
 packetsToSend = math.ceil(total_data/packetlen)
 ###GLOBAL PARAMS ####
@@ -74,7 +73,6 @@ c = 299792.458 ###SPEED LIGHT [km/s]
 Ptx = 14
 G_device = 0; ##ANTENNA GAIN FOR AN END-DEVICE
 G_sat = 12;   ##ANTENNA GAIN FOR SATELLITE
-nodes = [] ###EACH NODE WILL BE APPENDED TO THIS VARIABLE
 freq =868e6 ##USED FOR PATH LOSS CALCULATION
 frequency = [868100000, 868300000, 868500000] ##FROM LORAWAN REGIONAL PARAMETERS EU863-870 / EU868
 
@@ -239,7 +237,10 @@ Collmap = [[0 for i in range(0,6)] for j in range(0,6)]
 
 def simulate_scenario (nrNodes):
     env = simpy.Environment()
-    
+    random.seed(RANDOM_SEED) #RANDOM SEED IS FOR GENERATE ALWAYS THE SAME RANDOM NUMBERS (ie SAME RESULTS OF SIMULATION)
+    nodes = [] ###EACH NODE WILL BE APPENDED TO THIS VARIABLE
+    logs = []
+
     def powerCollision_2(p1, p2):
         #powerThreshold = 6
         global Collmap
@@ -502,7 +503,7 @@ def simulate_scenario (nrNodes):
         global wait_max
         global back_off
         global beacon_time
-        global logs
+        
         global nodesToSend
         global DR
         while node.buffer > 0.0:
@@ -691,7 +692,7 @@ def simulate_scenario (nrNodes):
     def beacon (env):
         global beacon_time
         global nodesToSend
-        global logs
+        
         i = 0
         while True:
             if i == 0:
@@ -775,7 +776,6 @@ if chan == 1:
 if chan ==3:
     ###SCENARIO 3 CHANNELS###
     channel = [0,1,2]
-    nodes = [] ###EACH NODE WILL BE APPENDED TO THIS VARIABLE
     nrLost = 0 ### TOTAL OF LOST PACKETS DUE Lpl
     nrCollisions = 0 ##TOTAL OF COLLIDED PACKETS
     nrProcessed = 0 ##TOTAL OF PROCESSED PACKETS
@@ -792,7 +792,7 @@ if chan ==3:
     
     for nrNodes in multi_nodes:
         print ("\n\n***NEW SCENARIO BEGINS***\n")
-        logs = []
+
         results,logs = simulate_scenario(nrNodes)
         scenario_3ch[i,:] = results
         folder = name+'_3CH_s'+str(RANDOM_SEED)+'_p'+str(packetsToSend)
