@@ -41,7 +41,6 @@ else:
     p_skip_param = int(sys.argv[21])
 
     sim_type = sys.argv[22]
-random.seed(RANDOM_SEED) #RANDOM SEED IS FOR GENERATE ALWAYS THE SAME RANDOM NUMBERS (ie SAME RESULTS OF SIMULATION)
 nodesToSend = []
 packetsToSend = math.ceil(total_data/packetlen)
 ###GLOBAL PARAMS ####
@@ -201,16 +200,16 @@ elev = np.degrees(np.arcsin(599/distance))
 
 def simulate_scenario (nrNodes, sim_type):
     env = simpy.Environment()
-    
+    random.seed(RANDOM_SEED) #RANDOM SEED IS FOR GENERATE ALWAYS THE SAME RANDOM NUMBERS (ie SAME RESULTS OF SIMULATION)
+    nodes = [] ###EACH NODE WILL BE APPENDED TO THIS VARIABLE
+    logs = []
 
-          
     def transmit_eb(env,node):
         #while nodes[node.nodeid].buffer > 0.0:
         global wait_min
         global wait_max
         global back_off
         global beacon_time
-        global logs
         global nodesToSend
         global DR
         while node.buffer > 0.0:
@@ -402,7 +401,6 @@ def simulate_scenario (nrNodes, sim_type):
         global wait_max
         global back_off
         global beacon_time
-        global logs
         global nodesToSend
         global DR
         while node.buffer > 0.0:
@@ -672,7 +670,6 @@ def simulate_scenario (nrNodes, sim_type):
         global wait_max
         global back_off
         global beacon_time
-        global logs
         global nodesToSend
         global DR
         global beacon_rec
@@ -950,7 +947,7 @@ def simulate_scenario (nrNodes, sim_type):
         global wait_max
         global back_off
         global beacon_time
-        global logs
+        
         global nodesToSend
         global DR
         while node.buffer > 0.0:
@@ -1209,7 +1206,7 @@ def simulate_scenario (nrNodes, sim_type):
         global wait_max
         global back_off
         global beacon_time
-        global logs
+        
         global nodesToSend
         global DR
         global beacon_rec
@@ -1476,7 +1473,7 @@ def simulate_scenario (nrNodes, sim_type):
         global wait_max
         global back_off
         global beacon_time
-        global logs
+        
         global nodesToSend
         global DR
         while node.buffer > 0.0:
@@ -1701,7 +1698,6 @@ def simulate_scenario (nrNodes, sim_type):
     def beacon (env):
         global beacon_time
         global nodesToSend
-        global logs
         global beacon_rec
         i = 0
         while True:
@@ -1737,69 +1733,23 @@ def simulate_scenario (nrNodes, sim_type):
             env.process(transmit_et(env,node))
 
 
-
-
-
-
-
-        
     env.run(until=600*2)
-    
+
     sent = sum(n.sent for n in nodes)
+
+    folder = '../resultados/'+sim_type+'_3CH_s'+str(RANDOM_SEED)+'_p'+str(packetsToSend)+"_NOVO"
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    fname = "./"+folder+"/" + str(sim_type+"_"+str(nrNodes)+"_3CH_"+str(maxBSReceives)+"_s"+str(RANDOM_SEED)+"_p"+str(packetsToSend)) + ".csv"
+    with open(fname,"w") as myfile:
+        myfile.write("\n".join(logs))
+    myfile.close()
+    i=i+1
+    if not mode_debbug:
+        nodes = [] ###EACH NODE WILL BE APPENDED TO THIS VARIABLE
+
     return ([sent,nrCollFullPacket,None,None,nrReceived],logs)
 
-
-
-#########################################################################
-# if chan == 1:
-#     ###SCENARIO 1 CHANNEL###
-#     channel = [0]
-    
-#     nodes = [] ###EACH NODE WILL BE APPENDED TO THIS VARIABLE
-#     nrLost = 0 ### TOTAL OF LOST PACKETS DUE Lpl
-#     nrCollisions = 0 ##TOTAL OF COLLIDED PACKETS
-#     nrProcessed = 0 ##TOTAL OF PROCESSED PACKETS
-#     nrReceived = 0 ###TOTAL OF RECEIVED PACKETS
-#     nrNoProcessed = 0 ##TOTAL OF INTRA-PACKETS NO PROCESSED
-#     nrIntraTot = 0
-#     nrLostMaxRec = 0
-#     nrCollFullPacket = 0
-#     nrSentIntra = 0 ##TOTAL OF SENT INTRA-PACKTES
-#     nrReceivedIntra = 0 ##TOTAL OF RECEIVED INTRA-PACKETS
-    
-#     i =0
-#     scenario_1ch = np.zeros((len(multi_nodes),5))
-#     results = []
-#     ## WHERE:
-#         ## scenario_1ch[i,j]:
-#             ## i --> the node i
-#             ## j --> [sent, nrCollisions, nrLost, nrProcessed, nrReceived]
-    
-#     for nrNodes in multi_nodes:
-#         print ("\n\n***NEW SCENARIO BEGINS***\n")
-#         logs = []
-#         results,logs = simulate_scenario(nrNodes)
-#         scenario_1ch[i,:] = results
-#         folder = name+'_1CH_s'+str(RANDOM_SEED)+'_p'+str(packetsToSend)+"_NOVO"
-#         if not os.path.exists(folder):
-#             os.makedirs(folder)
-#         fname = "./"+folder+"/" + str(name+"_"+str(nrNodes)+"_1CH_"+str(maxBSReceives)+"_s"+str(RANDOM_SEED)+"_p"+str(packetsToSend)) + ".csv"
-#         with open(fname,"w") as myfile:
-#             myfile.write("\n".join(logs))
-#         myfile.close()
-#         i=i+1
-#         if not mode_debbug:
-#             nodes = [] ###EACH NODE WILL BE APPENDED TO THIS VARIABLE
-#         nrLost = 0 ### TOTAL OF LOST PACKETS DUE Lpl
-#         nrCollisions = 0 ##TOTAL OF COLLIDED PACKETS
-#         nrProcessed = 0 ##TOTAL OF PROCESSED PACKETS
-#         nrReceived = 0 ###TOTAL OF RECEIVED PACKETS
-#         nrNoProcessed = 0 ##TOTAL OF INTRA-PACKETS NO PROCESSED
-#         nrIntraTot = 0
-#         nrLostMaxRec = 0
-#         nrCollFullPacket = 0
-#         nrSentIntra = 0 ##TOTAL OF SENT INTRA-PACKTES
-#         nrReceivedIntra = 0 ##TOTAL OF RECEIVED INTRA-PACKETS
 
 
 #########################################################################
@@ -1823,29 +1773,8 @@ if chan ==3:
     
     for nrNodes in multi_nodes:
         print ("\n\n***NEW SCENARIO BEGINS***\n")
-        logs = []
-        results,logs = simulate_scenario(nrNodes, sim_type)
-        scenario_3ch[i,:] = results
-        folder = '../resultados/'+sim_type+'_3CH_s'+str(RANDOM_SEED)+'_p'+str(packetsToSend)+"_NOVO"
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-        fname = "./"+folder+"/" + str(sim_type+"_"+str(nrNodes)+"_3CH_"+str(maxBSReceives)+"_s"+str(RANDOM_SEED)+"_p"+str(packetsToSend)) + ".csv"
-        with open(fname,"w") as myfile:
-            myfile.write("\n".join(logs))
-        myfile.close()
-        i=i+1
-        if not mode_debbug:
-            nodes = [] ###EACH NODE WILL BE APPENDED TO THIS VARIABLE
-        nrLost = 0 ### TOTAL OF LOST PACKETS DUE Lpl
-        nrCollisions = 0 ##TOTAL OF COLLIDED PACKETS
-        nrProcessed = 0 ##TOTAL OF PROCESSED PACKETS
-        nrReceived = 0 ###TOTAL OF RECEIVED PACKETS
-        nrNoProcessed = 0 ##TOTAL OF INTRA-PACKETS NO PROCESSED
-        nrIntraTot = 0
-        nrLostMaxRec = 0
-        nrCollFullPacket = 0
-        nrSentIntra = 0 ##TOTAL OF SENT INTRA-PACKTES
-        nrReceivedIntra = 0 ##TOTAL OF RECEIVED INTRA-PACKETS
+        simulate_scenario(nrNodes, sim_type)
+
 
 if not mode_debbug:
     sys.stdout = old_stdout
