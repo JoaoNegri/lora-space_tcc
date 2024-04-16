@@ -5,7 +5,11 @@ from Intrapacket import IntraPacket
 from Header import Header
 
 class Node():
-    def __init__(self, nodeid, bs, avgSendTime, packetlen, total_data, distance, elev, channel, Ptx, Prx, frequency):
+    def __init__(self, nodeid:int, bs:int, avgSendTime:int, packetlen:int, 
+                 total_data:int, distance: np.ndarray[int,np.float64], 
+                 elev: np.ndarray[int, np.float64], channel: list[int], Ptx:int, 
+                 Prx: np.ndarray[int, np.float64], frequency: list[int]):
+
         global DR
         self.dr = 8
         #carriers = list(range(280))

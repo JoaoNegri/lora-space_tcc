@@ -1,8 +1,10 @@
 import random
+import numpy as np
 from aux import airtime
 
 class Packet():
-    def __init__(self, nodeid, packetlen, dist, Ptx, Prx, frequency, distance):
+    def __init__(self, nodeid:int, packetlen:int, dist: np.ndarray[int, np.float64], Ptx: int,
+                  Prx: np.ndarray[int, np.float64], frequency: list[int], distance: np.ndarray[int, np.float64]):
         #global experiment
         #global gamma
         #global d0

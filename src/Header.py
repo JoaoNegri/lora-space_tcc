@@ -1,5 +1,7 @@
+import numpy as np
 class Header ():
-    def __init__(self,nodeid,dist,ch,freqHop,dr, Prx, Ptx, distance):
+    def __init__(self ,nodeid: int, dist: np.ndarray[int, np.float64], ch: int, freqHop: list[int],
+    dr: int, Prx: np.ndarray[int, np.float64], Ptx: int, distance: np.ndarray[int, np.float64]):
         global channel
         global frequency
         self.nodeid = nodeid
