@@ -499,6 +499,7 @@ def simulate_scenario (nrNodes):
           
     def transmit(env,node):
         #while nodes[node.nodeid].buffer > 0.0:
+        random.seed(RANDOM_SEED)
         global wait_min
         global wait_max
         global back_off
