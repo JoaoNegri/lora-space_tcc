@@ -18,7 +18,6 @@ class Packet():
         self.transRange = 150
         self.symTime = (2.0**self.sf)/self.bw
         self.arriveTime = 0
-        self.rssi = Prx[nodeid%len(Prx),:,:]
         self.freq = int(random.choice(frequency)) 
         self.rectime = airtime(self.sf,self.cr,self.pl,self.bw) ##RECTIME IS THE RECEPTION TIME (ie AIRTIME)
 
