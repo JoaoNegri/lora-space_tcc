@@ -6,8 +6,8 @@ class Packet():
     
     C = 299792.458 ###SPEED LIGHT [km/s]
     
-    def __init__(self, nodeid:int, packetlen:int, dist: np.ndarray[int, np.float64], Ptx: int,
-                  Prx: np.ndarray[int, np.float64], frequency: list[int], distance: np.ndarray[int, np.float64]):
+    def __init__(self, nodeid:int, packetlen:int, Ptx: int, Prx: np.ndarray[int, np.float64], 
+                 frequency: list[int], distance: np.ndarray[int, np.float64], num_sat: int):
         self.nodeid = nodeid
         self.txpow = Ptx
         self.sf = 12
@@ -23,6 +23,13 @@ class Packet():
 
 
         self.proptime = distance[nodeid%len(distance),:,:]*(1/Packet.C)
-        self.collided = 0
-        self.processed = 0
-        self.lost = bool
+        
+
+        self.collided = []
+        self.processed = []
+        self.lost = []
+        for _ in range(num_sat):
+
+            self.collided.append(0)
+            self.processed.append(0)
+            self.lost.append(False)

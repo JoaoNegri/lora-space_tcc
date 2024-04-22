@@ -17,16 +17,14 @@ def powerCollision_2(p1, p2, Prx, sat, env):
     #print ("SF: node {} has {} ; node {} has {}".format(p1.nodeid,p1.sf, p2.nodeid, p2.sf))
     #print ("pwr: node {} with rssi {} dBm and node {} with rssi {} dBm; diff {:3.2f} dBm".format(p1,p1.rssi[math.ceil(env.now)], p2.nodeid,p2.rssi[math.ceil(env.now)], p1.rssi[math.ceil(env.now)] - p2.rssi[math.ceil(env.now)]))
     if True: #p1.sf == p2.sf:
-        if abs(Prx[p1.nodeid%len(Prx)][sat][math.ceil(env.now)] - Prx[p2.nodeid%len(Prx)][sat][math.ceil(env.now)]) < IsoThresholds[p1.dr-8][p2.dr-8]:
-            #TODO VERIFICAR O 0 !!!!!!!!!!!!!!!!!
+        if abs(Prx[p1.nodeid%len(Prx),sat, math.ceil(env.now)] - Prx[p2.nodeid%len(Prx),sat, math.ceil(env.now)]) < IsoThresholds[p1.dr-8][p2.dr-8]:
             print ("collision pwr both node {} and node {}".format(p1.nodeid, p2.nodeid))
             #Collmap[p1.sf-7][p2.sf-7] += 1
             #Collmap[p2.sf-7][p1.sf-7] += 1
             # packets are too close to each other, both collide
             # return both packets as casualties
             return (p1, p2)
-        elif Prx[p1.nodeid%len(Prx)][sat][math.ceil(env.now)] - Prx[p2.nodeid%len(Prx)][sat][math.ceil(env.now)] < IsoThresholds[p1.dr-8][p2.dr-8]:
-            #TODO VERIFICAR O 0 !!!!!!!!!!!!!!!!!
+        elif Prx[p1.nodeid%len(Prx),sat, math.ceil(env.now)] - Prx[p2.nodeid%len(Prx),sat, math.ceil(env.now)] < IsoThresholds[p1.dr-8][p2.dr-8]:
             # p2 overpowered p1, return p1 as casualty
             print ("collision pwr node {} overpowered node {}".format(p2.nodeid, p1.nodeid))
             print ("capture - p2 wins, p1 lost")
@@ -42,12 +40,12 @@ def checkcollision(packet, packetsAtBS, maxBSReceives,Prx, sat, env):
     processing = 0
     #print ("MAX RECEIVE IS: ", maxBSReceives)
     for i in range(0,len(packetsAtBS)):
-        if packetsAtBS[i].header.processed == 1 or packetsAtBS[i].intraPacket.processed == 1:
+        if packetsAtBS[i].header.processed[sat] == 1 or packetsAtBS[i].intraPacket.processed[sat] == 1:
             processing = processing + 1
     if (processing > maxBSReceives):
-        packet.processed = 0
+        packet.processed[sat] = 0
     else:
-        packet.processed = 1
+        packet.processed[sat] = 1
     if packetsAtBS:
         #print ("{:3.5f} || >> FOUND overlap... node {} (sf:{} bw:{} freq:{}) others: {}".format(env.now,packet.nodeid, packet.sf, packet.bw,packet.freq,len(packetsAtBS)))
         for other in packetsAtBS:
@@ -58,13 +56,16 @@ def checkcollision(packet, packetsAtBS, maxBSReceives,Prx, sat, env):
                 if frequencyCollision(packet, other.header):# and timingCollision(packet, other.packet):
                     c = powerCollision_2(packet, other.header,Prx, sat, env)
                     for p in c:
-                        p.col = 1
+                        print(p.nodeid, "2!!!!!!!!!!!!!!!!!!!!!!")
+
+                        p.col[sat] = 1
                         if p == packet:
                             col = 1
                 if frequencyCollision(packet, other.intraPacket):# and timingCollision(packet, other.packet):
                     c = powerCollision_2(packet, other.intraPacket,Prx, sat,env)
                     for p in c:
-                        p.col = 1
+                        print(p.nodeid, "!!!!!!!!!!!!!!!!!!!!!!!")
+                        p.col[sat] = 1
                         if p == packet:
                             col = 1
         return col
