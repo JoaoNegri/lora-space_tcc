@@ -234,7 +234,7 @@ def simulate_scenario (nrNodes, sim_type):
                 print ("{:3.5f} || ERROR: packet is already in...".format(env.now))
             else:
                 sensibility = sensi[12 - 7, [125,250,500].index(node.packet.bw) + 1]
-                if node.packet.rssi[sat, math.ceil(env.now)] < sensibility: #HERE WE ARE CONSIDERING RSSI AT TIME ENV.NOW
+                if Prx[node.nodeid%len(distance)][sat, math.ceil(env.now)] < sensibility: #HERE WE ARE CONSIDERING RSSI AT TIME ENV.NOW
                     print ("{:3.5f} || Node {}: Can not reach beacon due Lpl".format(env.now,node.nodeid))
                     wait =0 ##LETS WAIT FOR NEXT BEACON
                     node.header.lost = False
@@ -257,7 +257,7 @@ def simulate_scenario (nrNodes, sim_type):
                         #sensibility = sensi[node.packet.sf - 7, [125,250,500].index(node.packet.bw) + 1]
                         sensibility = node.sensi
                         #print ("------Sensi is: ",sensibility)
-                        if node.packet.rssi[sat, math.ceil(env.now)] < sensibility: #HERE WE ARE CONSIDERING RSSI AT TIME ENV.NOW
+                        if Prx[node.nodeid%len(distance)][sat, math.ceil(env.now)] < sensibility: #HERE WE ARE CONSIDERING RSSI AT TIME ENV.NOW
                         #TODO verificar [0] !!!!!! aqui tem q pensar bem
                         
                             print ("{:3.5f} || Node {}: The Packet will be Lost due Lpl".format(env.now,node.nodeid))
@@ -278,11 +278,11 @@ def simulate_scenario (nrNodes, sim_type):
                             #print ("SUBCHANELLLL: ",node.header.subCh)
                             node.header.sentIntra +=1
                             isLost =0
-                            if node.packet.rssi[sat,math.ceil(env.now)] < sensibility:
+                            if Prx[node.nodeid%len(Prx)][sat,math.ceil(env.now)] < sensibility:
                                 #TODO verificar [0] !!!!!! aqui tem q pensar bem
                                 node.header.Nlost +=1
                                 isLost =1
-                            if (checkcollision(node.header, packetsAtBS, maxBSReceives,env)==1):
+                            if (checkcollision(node.header, packetsAtBS, maxBSReceives ,Prx, sat,env)==1):
                                 #pass
                                 if node.header.col == 1:
                                     if isLost == 0:
@@ -319,13 +319,13 @@ def simulate_scenario (nrNodes, sim_type):
                             node.intraPacket.subCh = node.intraPacket.freqHopIntraPacket[j]
                             node.intraPacket.sentIntra +=1
                             isLost =0
-                            if node.packet.rssi[sat, math.ceil(env.now)] < sensibility:
+                            if Prx[node.nodeid%len(distance)][sat, math.ceil(env.now)] < sensibility:
                                 #TODO verificar [0] !!!!!! aqui tem q pensar bem
 
                                 node.intraPacket.Nlost +=1
                                 isLost =1
                             #print ("INTRA-PACKT SUB CHANNELLLL", node.intraPacket.subCh)
-                            if (checkcollision(node.intraPacket, packetsAtBS, maxBSReceives,env)==1):
+                            if (checkcollision(node.intraPacket, packetsAtBS, maxBSReceives,Prx, sat,env)==1):
                                 #pass
                                 if node.intraPacket.col == 1:
                                     if isLost ==0:

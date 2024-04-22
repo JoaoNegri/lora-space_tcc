@@ -11,13 +11,13 @@ ISDR11 = np.array([-15,-14,-13,1])
 
 IsoThresholds = np.array([ISDR8,ISDR9,ISDR10,ISDR11])
 
-def powerCollision_2(p1, p2, env):
+def powerCollision_2(p1, p2, Prx, sat, env):
     #powerThreshold = 6
     global Collmap
     #print ("SF: node {} has {} ; node {} has {}".format(p1.nodeid,p1.sf, p2.nodeid, p2.sf))
     #print ("pwr: node {} with rssi {} dBm and node {} with rssi {} dBm; diff {:3.2f} dBm".format(p1,p1.rssi[math.ceil(env.now)], p2.nodeid,p2.rssi[math.ceil(env.now)], p1.rssi[math.ceil(env.now)] - p2.rssi[math.ceil(env.now)]))
     if True: #p1.sf == p2.sf:
-        if abs(p1.rssi[0][math.ceil(env.now)] - p2.rssi[0][math.ceil(env.now)]) < IsoThresholds[p1.dr-8][p2.dr-8]:
+        if abs(Prx[p1.nodeid%len(Prx)][sat][math.ceil(env.now)] - Prx[p2.nodeid%len(Prx)][sat][math.ceil(env.now)]) < IsoThresholds[p1.dr-8][p2.dr-8]:
             #TODO VERIFICAR O 0 !!!!!!!!!!!!!!!!!
             print ("collision pwr both node {} and node {}".format(p1.nodeid, p2.nodeid))
             #Collmap[p1.sf-7][p2.sf-7] += 1
@@ -25,7 +25,7 @@ def powerCollision_2(p1, p2, env):
             # packets are too close to each other, both collide
             # return both packets as casualties
             return (p1, p2)
-        elif p1.rssi[0][math.ceil(env.now)] - p2.rssi[0][math.ceil(env.now)] < IsoThresholds[p1.dr-8][p2.dr-8]:
+        elif Prx[p1.nodeid%len(Prx)][sat][math.ceil(env.now)] - Prx[p2.nodeid%len(Prx)][sat][math.ceil(env.now)] < IsoThresholds[p1.dr-8][p2.dr-8]:
             #TODO VERIFICAR O 0 !!!!!!!!!!!!!!!!!
             # p2 overpowered p1, return p1 as casualty
             print ("collision pwr node {} overpowered node {}".format(p2.nodeid, p1.nodeid))
@@ -37,7 +37,7 @@ def powerCollision_2(p1, p2, env):
         #Collmap[p2.sf-7][p1.sf-7] += 1
         return (p2,)
             
-def checkcollision(packet, packetsAtBS, maxBSReceives,env):
+def checkcollision(packet, packetsAtBS, maxBSReceives,Prx, sat, env):
     col = 0 # flag needed since there might be several collisions for packet
     processing = 0
     #print ("MAX RECEIVE IS: ", maxBSReceives)
@@ -56,13 +56,13 @@ def checkcollision(packet, packetsAtBS, maxBSReceives,env):
                 # simple collision
                 #if frequencyCollision(packet, other.packet) and sfCollision(packet, other.packet):
                 if frequencyCollision(packet, other.header):# and timingCollision(packet, other.packet):
-                    c = powerCollision_2(packet, other.header,env)
+                    c = powerCollision_2(packet, other.header,Prx, sat, env)
                     for p in c:
                         p.col = 1
                         if p == packet:
                             col = 1
                 if frequencyCollision(packet, other.intraPacket):# and timingCollision(packet, other.packet):
-                    c = powerCollision_2(packet, other.intraPacket,env)
+                    c = powerCollision_2(packet, other.intraPacket,Prx, sat,env)
                     for p in c:
                         p.col = 1
                         if p == packet:

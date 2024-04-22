@@ -9,12 +9,10 @@ class Header ():
         self.txpow = Ptx
         self.transRange = 150
         self.arriveTime = 0
-        self.rssi = Prx[nodeid%len(Prx),:,:]
         self.rectime = 0.233
         #self.rectime = 1.5
 
 
-        self.proptime = distance[nodeid%len(distance),:,:]*(1/Header.c)
         for _ in range(num_sat):
 
             self.collided = 0

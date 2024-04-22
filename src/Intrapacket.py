@@ -9,7 +9,6 @@ class IntraPacket ():
         self.txpow = Ptx
         self.transRange = 150
         self.arriveTime = 0
-        self.rssi = Prx[nodeid%len(Prx),:,:]
         self.freqHopIntraPacket = freqHop[3:]
         self.rectime = 50e-3
         #self.rectime = 3
