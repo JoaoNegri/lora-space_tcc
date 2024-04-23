@@ -9,15 +9,14 @@ class IntraPacket ():
         self.txpow = Ptx
         self.transRange = 150
         self.arriveTime = 0
-        self.freqHopIntraPacket = freqHop[3:]
         self.rectime = 50e-3
         #self.rectime = 3
-        self.subCh = 0
 
 
-        self.proptime = distance[nodeid%len(distance),:,:]*(1/IntraPacket.c)
+        # self.proptime = distance[nodeid%len(distance),:,:]*(1/ 299792.458)
         
-
+        self.freqHopIntraPacket = []
+        self.subCh = []
         self.collided = []
         self.noCollided = []
         self.nrColl = []
@@ -28,7 +27,8 @@ class IntraPacket ():
         self.sentIntra = []
         self.col = []
         for _ in range(num_sat):
-
+            self.freqHopIntraPacket.append(freqHop[3:])
+            self.subCh.append(0)
             self.collided.append(0)
             self.noCollided.append(0)
             self.nrColl.append(0)
@@ -41,11 +41,3 @@ class IntraPacket ():
 
         self.dr = dr
         self.ch = ch
-        if dr == "dr8":
-            self.freqHopIntraPacket = freqHop[3:]
-        elif dr == "dr9":
-            self.freqHopIntraPacket = freqHop[2:]
-        elif dr == "dr10":
-            self.freqHopIntraPacket = freqHop[3:]
-        elif dr == "dr11":
-            self.freqHopIntraPacket = freqHop[2:]

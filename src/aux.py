@@ -53,7 +53,7 @@ def checkcollision(packet, packetsAtBS, maxBSReceives,Prx, sat, env):
                 #print ("{:3.5f} || >> node {} overlapped with node {} (sf:{} bw:{} freq:{}). Let's check Freq...".format(env.now,packet.nodeid, other.nodeid, other.packet.sf, other.packet.bw,other.packet.freq))
                 # simple collision
                 #if frequencyCollision(packet, other.packet) and sfCollision(packet, other.packet):
-                if frequencyCollision(packet, other.header):# and timingCollision(packet, other.packet):
+                if frequencyCollision(packet, other.header, sat):# and timingCollision(packet, other.packet):
                     c = powerCollision_2(packet, other.header,Prx, sat, env)
                     for p in c:
                         print(p.nodeid, "2!!!!!!!!!!!!!!!!!!!!!!")
@@ -61,7 +61,7 @@ def checkcollision(packet, packetsAtBS, maxBSReceives,Prx, sat, env):
                         p.col[sat] = 1
                         if p == packet:
                             col = 1
-                if frequencyCollision(packet, other.intraPacket):# and timingCollision(packet, other.packet):
+                if frequencyCollision(packet, other.intraPacket, sat):# and timingCollision(packet, other.packet):
                     c = powerCollision_2(packet, other.intraPacket,Prx, sat,env)
                     for p in c:
                         print(p.nodeid, "!!!!!!!!!!!!!!!!!!!!!!!")
@@ -72,11 +72,11 @@ def checkcollision(packet, packetsAtBS, maxBSReceives,Prx, sat, env):
     return 0
 
     
-def frequencyCollision(p1,p2):
+def frequencyCollision(p1,p2, sat):
     if (p1.ch == p2.ch):
         #print ("{:3.5f} || >> same channel for header on node {} and node {}.. Let's check sub-channels...".format(env.now,p1.nodeid,p2.nodeid))
         #if (p1.freqHopHeader[replica] == p2.freqHopHeader[replica]):
-        if (p1.subCh == p2.subCh):
+        if (p1.subCh[sat] == p2.subCh[sat]):
             #print ("{:3.5f} || >> same sub-channel for header on node {} and node {}".format(env.now,p1.nodeid,p2.nodeid))
             #print ("{:3.5f} || >> Header {} from node {} collided!!!".format(env.now,replica,p1.nodeid))
             return True

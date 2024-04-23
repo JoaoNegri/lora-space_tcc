@@ -15,6 +15,7 @@ SYNOPSIS
 
 """
 
+from time import sleep
 import simpy
 import random
 import numpy as np
@@ -36,10 +37,10 @@ import sys
 name = "EB2"
 mode_debbug = 0
 
-if not mode_debbug:
-    null = open(os.devnull, 'w')
-    old_stdout = sys.stdout
-    sys.stdout = null
+# if not mode_debbug:
+#     null = open(os.devnull, 'w')
+#     old_stdout = sys.stdout
+#     sys.stdout = null
 ####WE START BY USING SF=12 ADN BW=125 AND CR=1, FOR ALL NODES AND ALL TRANSMISIONS######
 
 if mode_debbug:
@@ -237,7 +238,6 @@ Collmap = [[0 for i in range(0,6)] for j in range(0,6)]
 
 def simulate_scenario (nrNodes):
     env = simpy.Environment()
-    random.seed(RANDOM_SEED) #RANDOM SEED IS FOR GENERATE ALWAYS THE SAME RANDOM NUMBERS (ie SAME RESULTS OF SIMULATION)
     nodes = [] ###EACH NODE WILL BE APPENDED TO THIS VARIABLE
     logs = []
 
@@ -497,9 +497,8 @@ def simulate_scenario (nrNodes):
         return ((Tpream + Tpayload)/1000) ##IN SECS
     
           
-    def transmit(env,node):
+    def transmit(env,node, random):
         #while nodes[node.nodeid].buffer > 0.0:
-        random.seed(RANDOM_SEED)
         global wait_min
         global wait_max
         global back_off
@@ -533,6 +532,8 @@ def simulate_scenario (nrNodes):
                 else:
                     nodesToSend.append(node.nodeid)
                     wait = random.uniform(1,back_off - node.packet.rectime - float(node.packet.proptime[math.ceil(env.now)])) ##TRIGGER BACK-OFF TIME
+                    print(node.nodeid)
+                    print(wait)
                     yield env.timeout(wait)
                     #print ("{:3.5f} || Node {} begins to transmit a packet".format(env.now,node.nodeid))
                     trySend = True
@@ -598,6 +599,8 @@ def simulate_scenario (nrNodes):
                         #print ("NUMBER OF INTRA PACKETSSSS",nIntraPackets)
                         
                         for j in range (nIntraPackets):
+                            if node.nodeid == 109 and nrNodes == 200:
+                                print(j)
                             ###print ("{:3.5f} || Sending intra-packet {} of {} for node {}...".format(env.now,j,nIntraPackets-1,node.nodeid))
                             ###print ("{:3.5f} || Let's try if there are collisions...".format(env.now))
                             node.intraPacket.subCh = node.intraPacket.freqHopIntraPacket[j]
@@ -625,7 +628,6 @@ def simulate_scenario (nrNodes):
                             if (node in packetsAtBS):
                                 packetsAtBS.remove(node)
                             #print ("INTRA-PACKET NO-PROCESEDDD",node.intraPacket.noProcessed)
-            
             node.header.noCollided = len(node.header.freqHopHeader)-node.header.Nlost-node.header.collided
             node.intraPacket.noCollided = nIntraPackets-node.intraPacket.Nlost-node.intraPacket.collided
             if node.header.noCollided <0:
@@ -685,6 +687,11 @@ def simulate_scenario (nrNodes):
                 #print ("NODE HEADER TIME",node.header.rectime)
                 #print ("ONE INTRA-PACKET TIMEE",node.intraPacket.rectime)
                 #yield env.timeout(beacon_time-wait)
+                print('d',node.nodeid)
+                print('e',beacon_time)
+                print('f',wait)
+                print('g',node.header.rectime)
+                print('h',beacon_time-wait-2*3*node.header.rectime-2*nIntraPackets*node.intraPacket.rectime)
                 yield env.timeout(beacon_time-wait-2*3*node.header.rectime-2*nIntraPackets*node.intraPacket.rectime)
             else:
                 nIntraPackets = 0
@@ -709,10 +716,12 @@ def simulate_scenario (nrNodes):
     env.process(beacon(env)) ##BEACON SENDER
     
     ### THIS IS GOING TO CREATE NODES AND DO TRAMSMISIONS. IS THE MAIN PROGRAM ###
+    rand = random.Random(RANDOM_SEED)
+
     for i in range(nrNodes):
         node = myNode(i,bsId, avgSendTime, packetlen, total_data)
         nodes.append(node)
-        env.process(transmit(env,node))
+        env.process(transmit(env,node, rand))
         
     env.run(until=600*2)
     
@@ -804,6 +813,7 @@ if chan ==3:
             myfile.write("\n".join(logs))
         myfile.close()
         i=i+1
+
         if not mode_debbug:
             nodes = [] ###EACH NODE WILL BE APPENDED TO THIS VARIABLE
         nrLost = 0 ### TOTAL OF LOST PACKETS DUE Lpl

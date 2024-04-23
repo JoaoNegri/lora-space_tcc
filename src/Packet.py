@@ -22,7 +22,6 @@ class Packet():
         self.rectime = airtime(self.sf,self.cr,self.pl,self.bw) ##RECTIME IS THE RECEPTION TIME (ie AIRTIME)
 
 
-        self.proptime = distance[nodeid%len(distance),:,:]*(1/Packet.C)
         
 
         self.collided = []
