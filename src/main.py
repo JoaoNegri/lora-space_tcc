@@ -170,7 +170,7 @@ def simulate_scenario(nrNodes, sim_type):
 
     for i in range(nrNodes):
         node = Node(i, bsId, avgSendTime, packetlen, total_data,
-                    distance, elev, channel, Ptx, Prx, frequency, num_sat)
+                    distance, elev, channel, Ptx, Prx, frequency, num_sat, type='LRFHSS')
         nodes.append(node)
 
     def transmit_eb(env: simpy.Environment, node: Node, sat: int, random: random.Random):
@@ -213,17 +213,17 @@ def simulate_scenario(nrNodes, sim_type):
 
                     wait = 0  # LETS WAIT FOR NEXT BEACON
                     # define todos os itens como falso
-                    node.header.lost[sat] = True
+                    node.header.lost[sat] = False
                     # define todos os itens como falso
-                    node.intraPacket.lost[sat] = True
+                    node.intraPacket.lost[sat] = False
                     trySend = False
                     nIntraPackets = 0
                 else:
                     # nodesToSend[sat].append(node.nodeid)
                     # TODO VERIFICAR NODESTOSEND
 
-                    wait = random.uniform(2, back_off) - node.packet.rectime - float(distance[node.nodeid % len(
-                        distance), sat, math.ceil(env.now)]*(1/299792.458))  # TRIGGER BACK-OFF e subtrai o tempo de propagação do satélite
+                    wait = random.uniform(1, back_off - node.packet.rectime - float(distance[node.nodeid % len(
+                        distance), 0, math.ceil(env.now)]*(1/299792.458)))  # TRIGGER BACK-OFF e subtrai o tempo de propagação do satélite
                     # MAX_wait = 90 (considera tempo de propagação)
                     # AQUI TRANSMITIU, APÓS O WAIT TIME !!!!!! wait time considera o tempo de propagação, e por isso devem ser feitas simulações separadas para cada satélite
                     print(distance[node.nodeid % len(

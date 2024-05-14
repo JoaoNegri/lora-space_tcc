@@ -108,3 +108,136 @@ def airtime(sf,cr,pl,bw):
     payloadSymbNB = 8 + max(math.ceil((8.0*pl-4.0*sf+28+16-20*H)/(4.0*(sf-2*DE)))*(cr+4),0)
     Tpayload = payloadSymbNB * Tsym
     return ((Tpream + Tpayload)/1000) ##IN SECS
+
+
+IS7 = np.array([1,-8,-9,-9,-9,-9])
+IS8 = np.array([-11,1,-11,-12,-13,-13])
+IS9 = np.array([-15,-13,1,-13,-14,-15])
+IS10 = np.array([-19,-18,-17,1,-17,-18])
+IS11 = np.array([-22,-22,-21,-20,1,-20])
+IS12 = np.array([-25,-25,-25,-24,-23,1])
+
+#THIS IS THE MATRIX OF CROSS INTERFERENCE BETWEEN SF
+IsoThresholds = np.array([IS7,IS8,IS9,IS10,IS11,IS12])
+Collmap = [[0 for i in range(0,6)] for j in range(0,6)]
+
+def powerCollision_2_LORA(p1, p2, Prx, sat, env):
+    #powerThreshold = 6
+    global Collmap
+    # print ("SF: node {} has {} ; node {} has {}".format(p1.nodeid,p1.sf, p2.nodeid, p2.sf))
+    # print ("pwr: node {} with rssi {} dBm and node {} with rssi {} dBm; diff {:3.2f} dBm".format(p1,p1.rssi[math.ceil(env.now)], p2.nodeid,p2.rssi[math.ceil(env.now)], p1.rssi[math.ceil(env.now)] - p2.rssi[math.ceil(env.now)]))
+    if p1.sf == p2.sf:
+        if abs(Prx[p1.nodeid%len(Prx),sat, math.ceil(env.now)] - Prx[p2.nodeid%len(Prx),sat, math.ceil(env.now)]) < IsoThresholds[p1.sf-7][p2.sf-7]:
+            print ("collision pwr both node {} and node {}".format(p1.nodeid, p2.nodeid))
+            Collmap[p1.sf-7][p2.sf-7] += 1
+            Collmap[p2.sf-7][p1.sf-7] += 1
+            # packets are too close to each other, both collide
+            # return both packets as casualties
+            return (p1, p2)
+        elif Prx[p1.nodeid%len(Prx),sat, math.ceil(env.now)] - Prx[p2.nodeid%len(Prx),sat, math.ceil(env.now)] < IsoThresholds[p1.sf-7][p2.sf-7]:
+            # p2 overpowered p1, return p1 as casualty
+            print ("collision pwr node {} overpowered node {}".format(p2.nodeid, p1.nodeid))
+            print ("capture - p2 wins, p1 lost")
+            Collmap[p1.sf-7][p2.sf-7] += 1
+            return (p1,)
+        print ("capture - p1 wins, p2 lost")
+        # p2 was the weaker packet, return it as a casualty
+        Collmap[p2.sf-7][p1.sf-7] += 1
+        return (p2,)
+    else:
+        if Prx[p1.nodeid%len(Prx),sat, math.ceil(env.now)]-Prx[p2.nodeid%len(Prx),sat, math.ceil(env.now)] > IsoThresholds[p1.sf-7][p2.sf-7]:
+            print ("P1 is OK")
+            if Prx[p2.nodeid%len(Prx),sat, math.ceil(env.now)]-Prx[p1.nodeid%len(Prx),sat, math.ceil(env.now)] > IsoThresholds[p2.sf-7][p1.sf-7]:
+                print ("p2 is OK")
+                return ()
+            else:
+                print ("p2 is lost")
+                Collmap[p2.sf-7][p1.sf-7] += 1
+                return (p2,)
+        else:
+            print ("p1 is lost")
+            Collmap[p1.sf-7][p2.sf-7] += 1
+            if Prx[p2.nodeid%len(Prx),sat, math.ceil(env.now)]-Prx[p1.nodeid%len(Prx),sat, math.ceil(env.now)] > IsoThresholds[p2.sf-7][p1.sf-7]:
+                print ("p2 is OK")
+                return (p1,)
+            else:
+                print( "p2 is lost")
+                Collmap[p2.sf-7][p1.sf-7] += 1
+                return (p1,p2)
+
+
+    
+def timingCollision_LORA(p1, p2,env):
+    # assuming p1 is the freshly arrived packet and this is the last check
+    # we've already determined that p1 is a weak packet, so the only
+    # way we can win is by being late enough (only the first n - 5 preamble symbols overlap)
+
+    # assuming 8 preamble symbols
+    Npream = 8
+
+    # we can lose at most (Npream - 5) * Tsym of our preamble
+    Tpreamb = 2**p1.sf/(1.0*p1.bw) * (Npream - 5)
+
+    # check whether p2 ends in p1's critical section
+    p2_end = p2.addTime + p2.rectime
+    p1_cs = env.now + (Tpreamb/1000.0)  # to sec
+    print ("collision timing node {} ({},{},{}) node {} ({},{})".format(
+        p1.nodeid, env.now - env.now, p1_cs - env.now, p1.rectime,
+        p2.nodeid, p2.addTime - env.now, p2_end - env.now
+    ))
+    if p1_cs < p2_end:
+        # p1 collided with p2 and lost
+        print ("not late enough")
+        return True
+    print ("saved by the preamble")
+    return False
+
+def checkcollision_LORA(packet, packetsAtBS,maxBSReceives, sat, Prx, env):
+    col = 0 # flag needed since there might be several collisions for packet
+    processing = 0
+    #print ("MAX RECEIVE IS: ", maxBSReceives)
+    for i in range(0,len(packetsAtBS)):
+        if packetsAtBS[i].packet.processed[sat] == 1:
+            processing = processing + 1
+    if (processing > maxBSReceives):
+        print ("{:3.5f} || Too much packets on Base Sattion.. Packet will be lost!", len(packetsAtBS))
+        packet.processed[sat] = 0
+    else:
+        packet.processed[sat] = 1
+
+    if packetsAtBS:
+        print ("{:3.5f} || >> FOUND overlap... node {} (sf:{} bw:{} freq:{}) others: {}".format(env.now,packet.nodeid, packet.sf, packet.bw,packet.freq,len(packetsAtBS)))
+        for other in packetsAtBS:
+            if other.nodeid != packet.nodeid:
+                print ("{:3.5f} || >> node {} overlapped with node {} (sf:{} bw:{} freq:{}). Let's check Freq...".format(env.now,packet.nodeid, other.nodeid, other.packet.sf, other.packet.bw,other.packet.freq))
+                # simple collision
+                #if frequencyCollision(packet, other.packet) and sfCollision(packet, other.packet):
+                if frequencyCollision_LORA(packet, other.packet,env) and timingCollision_LORA(packet, other.packet,env):
+                    c = powerCollision_2_LORA(packet, other.packet,Prx,sat,env)
+                    for p in c:
+                        p.collided[sat] = 1
+                        if p == packet:
+                            col = 1
+        return col
+    return 0
+
+
+###frequencyCollision, CONDITIONS###
+
+##|f1-f2| <= 120 kHz if f1 or f2 has bw 500
+##|f1-f2| <= 60 kHz if f1 or f2 has bw 250
+##|f1-f2| <= 30 kHz if f1 or f2 has bw 125
+def frequencyCollision_LORA(p1,p2,env):
+    if (abs(p1.freq-p2.freq)<=120 and (p1.bw==500 or p2.freq==500)):
+        print ("{:3.5f} || >> freq coll on node {} and node {}.. Let's check SF...".format(env.now,p1.nodeid, p2.nodeid))
+        return True
+    elif (abs(p1.freq-p2.freq)<=60 and (p1.bw==250 or p2.freq==250)):
+        print ("{:3.5f} || >> freq coll on node {} and node {}.. Let's check SF...".format(env.now,p1.nodeid, p2.nodeid))
+        return True
+    else:
+        if (abs(p1.freq-p2.freq)<=30):
+            print( "{:3.5f} || >> Freq coll on node {} and node {}.. Let's check SF...".format(env.now,p1.nodeid, p2.nodeid))
+            return True
+        #else:
+    print ("{:3.5f} || >> No frequency collision..".format(env.now))
+    return False

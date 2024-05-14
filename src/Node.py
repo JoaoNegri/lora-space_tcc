@@ -12,7 +12,7 @@ class Node():
                  total_data: int, distance: np.ndarray[int, np.float64],
                  elev: np.ndarray[int, np.float64], channel: list[int], Ptx: int,
                  Prx: np.ndarray[int, np.float64], frequency: list[int],
-                 num_sat: int):
+                 num_sat: int, type: str):
 
         self.dr = 8
 
@@ -37,22 +37,23 @@ class Node():
             self.totalColl.append(0)
             self.totalRec.append(0)
             self.totalProc.append(0)
-            if self.dr == 8:
-                carriers = list(range(280))
-                random.shuffle(carriers)  # TO CHOOSE THE HOPPING JUMPS
-                self.freqHop.append(carriers[0:35])
-            elif self.dr == 9:
-                carriers = list(range(280))
-                random.shuffle(carriers)  # TO CHOOSE THE HOPPING JUMPS
-                self.freqHop.append(carriers[0:35])
-            elif self.dr == 10:
-                carriers = list(range(688))
-                random.shuffle(carriers)  # TO CHOOSE THE HOPPING JUMPS
-                self.freqHop.append(carriers[0:86])
-            elif self.dr == 11:
-                carriers = list(range(688))
-                random.shuffle(carriers)  # TO CHOOSE THE HOPPING JUMPS
-                self.freqHop.append(carriers[0:86])
+            if type !='Legacy':
+                if self.dr == 8:
+                    carriers = list(range(280))
+                    random.shuffle(carriers)  # TO CHOOSE THE HOPPING JUMPS
+                    self.freqHop.append(carriers[0:35])
+                elif self.dr == 9:
+                    carriers = list(range(280))
+                    random.shuffle(carriers)  # TO CHOOSE THE HOPPING JUMPS
+                    self.freqHop.append(carriers[0:35])
+                elif self.dr == 10:
+                    carriers = list(range(688))
+                    random.shuffle(carriers)  # TO CHOOSE THE HOPPING JUMPS
+                    self.freqHop.append(carriers[0:86])
+                elif self.dr == 11:
+                    carriers = list(range(688))
+                    random.shuffle(carriers)  # TO CHOOSE THE HOPPING JUMPS
+                    self.freqHop.append(carriers[0:86])
 
         self.header = Header(self.nodeid, self.ch, self.freqHop,
                              self.dr, Prx, Ptx, distance, num_sat)
