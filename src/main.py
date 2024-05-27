@@ -222,22 +222,19 @@ def simulate_scenario(nrNodes, sim_type):
                     # nodesToSend[sat].append(node.nodeid)
                     # TODO VERIFICAR NODESTOSEND
 
-                    wait = random.uniform(1, back_off - node.packet.rectime - float(distance[node.nodeid % len(
-                        distance), 0, math.ceil(env.now)]*(1/299792.458)))  # TRIGGER BACK-OFF e subtrai o tempo de propagação do satélite
+                    wait = random.uniform(2, back_off) - node.packet.rectime  # TRIGGER BACK-OFF e subtrai o tempo de propagação do satélite
                     # MAX_wait = 90 (considera tempo de propagação)
                     # AQUI TRANSMITIU, APÓS O WAIT TIME !!!!!! wait time considera o tempo de propagação, e por isso devem ser feitas simulações separadas para cada satélite
-                    print(distance[node.nodeid % len(
-                        distance), sat, math.ceil(env.now)])
-                    print(node.packet.rectime)
-                    print(sat)
                     yield env.timeout(wait)
+                    logs[sat].append("trysend {} ==> {:3.3f}".format(node.nodeid,env.now))
+
+                    yield env.timeout(distance[node.nodeid % len(distance), sat, math.ceil(env.now)]*(1/299792.458))
 
                     trySend = True
                     node.sent = node.sent + 1
                     node.buffer[sat] = node.buffer[sat] - node.packetlen
                     if node in packetsAtBS[sat]:
                         print("{} || ERROR: packet is already in...".format(env.now))
-                        logs[0].append('aquiieiieieiei22222')
                     else:
                         # sensibility = sensi[node.packet.sf - 7, [125,250,500].index(node.packet.bw) + 1]
                         sensibility = node.sensi
@@ -395,7 +392,7 @@ def simulate_scenario(nrNodes, sim_type):
                 # print ("NODE HEADER TIME",node.header.rectime)
                 # print ("ONE INTRA-PACKET TIMEE",node.intraPacket.rectime)
                 # yield env.timeout(beacon_time-wait)
-                yield env.timeout(beacon_time-wait-2*3*node.header.rectime-2*nIntraPackets*node.intraPacket.rectime)
+                yield env.timeout(beacon_time-wait-2*3*node.header.rectime-2*nIntraPackets*node.intraPacket.rectime - distance[node.nodeid % len(distance), sat, math.ceil(env.now)]*(1/299792.458))
             else:
                 nIntraPackets = 0
                 yield env.timeout(beacon_time-wait-3*node.header.rectime-nIntraPackets*node.intraPacket.rectime)
