@@ -2,10 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
-path = '../resultados_simulacao_30_random_3_pacotes'
+path = '../../resultados/simulacao_1_sat_legacy_3_pcts'
 
-tipos_simulacao = os.listdir('../resultados_simulacao_30_random_3_pacotes')
-
+tipos_simulacao = os.listdir('../../resultados/simulacao_1_sat_legacy_3_pcts')
 j = 0
 for tipo_simulacao in tipos_simulacao: #lb, lt...
     iteracoes = os.listdir(path+'/'+tipo_simulacao)
@@ -18,8 +17,7 @@ for tipo_simulacao in tipos_simulacao: #lb, lt...
     
     for iteracao in iteracoes:#lr_3ch...
         sim =  os.listdir(path+'/'+tipo_simulacao+'/'+iteracao)[0]
-           
-        df2 = pd.read_csv(path+'/'+tipo_simulacao+'/'+iteracao+'/'+sim,names=['timestamp','id','dist','elev','SF','status'])
+        df2 = pd.read_csv(path+'/'+tipo_simulacao+'/'+iteracao+'/'+sim,names=['timestamp','id','dist','elev','SF','status', 'pckt2snd'])
         for i in range(7, 13):
             df[str(i)] += len(df2[df2['SF'] == i])
         
@@ -54,6 +52,7 @@ for tipo_simulacao in tipos_simulacao: #lb, lt...
     colors = {7: 'navy', 8: 'blue', 9: 'lightblue', 10: 'lightsalmon', 11: 'red', 12: 'darkred'}   
     df2 = df
 
+    #df2.iloc[SF-7]/nº de pacotes transmitidos * TOA* 3 pacotes
     df2.iloc[0] = df2.iloc[0]/540000 * 0.0566*3
     df2.iloc[1] = df2.iloc[1]/540000 * 0.1029*3
     df2.iloc[2] = df2.iloc[2]/540000 * 0.1853*3
