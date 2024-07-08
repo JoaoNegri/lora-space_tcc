@@ -2,12 +2,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-leo_lla_df = pd.read_csv('../wider_scenario_2/LEO-LLA-Pos.csv',parse_dates=['TIME[UTC]'])
-sites_lla_df = pd.read_csv('../wider_scenario_2/SITES-LLA-Pos.csv')
+leo_lla_df = pd.read_csv('../../params/wider_scenario_2/LEO-LLA-Pos.csv',parse_dates=['TIME[UTC]'])
+sites_lla_df = pd.read_csv('../../params/wider_scenario_2/SITES-LLA-Pos.csv')
 
 
-leo_xyz_df = pd.read_csv('../wider_scenario_2/LEO-XYZ-Pos.csv',parse_dates=['TIME[UTC]'])
-sites_xyz_df = pd.read_csv('../wider_scenario_2/SITES-XYZ-Pos.csv')
+leo_xyz_df = pd.read_csv('../../params/wider_scenario_2/LEO-XYZ-Pos1200s_1_plot.csv',parse_dates=['TIME[UTC]'])
+sites_xyz_df = pd.read_csv('../../params/wider_scenario_2/SITES-XYZ-Pos.csv')
 
 print(leo_lla_df.head())
 # print(sites_lla_df.head())
