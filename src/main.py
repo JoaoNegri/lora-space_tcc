@@ -15,11 +15,11 @@ mode_debbug = 0
 beacon_rec = 0
 max_rec = 15
 
-# if not mode_debbug:
-#     null = open(os.devnull, 'w')
-#     old_stdout = sys.stdout
-#     sys.stdout = null
-### WE START BY USING SF=12 ADN BW=125 AND CR=1, FOR ALL NODES AND ALL TRANSMISIONS######
+if not mode_debbug:
+    null = open(os.devnull, 'w')
+    old_stdout = sys.stdout
+    sys.stdout = null
+## WE START BY USING SF=12 ADN BW=125 AND CR=1, FOR ALL NODES AND ALL TRANSMISIONS######
 
 if mode_debbug:
     RANDOM_SEED = 5
@@ -101,8 +101,9 @@ path = "../params/wider_scenario_2/"
 
 ### -137dB IS THE MINIMUN TOLERABLE SENSIBILITY, FOR SF=12 AND BW=125KHz ###
 
-leo_pos = [np.loadtxt(path + "LEO-XYZ-Pos_sat1.csv", skiprows=1, delimiter=',', usecols=(1, 2, 3)),
-           np.loadtxt(path + "LEO-XYZ-Pos_sat2.csv", skiprows=1, delimiter=',', usecols=(1, 2, 3))]
+leo_pos = [np.loadtxt(path + "LEO-XYZ-Pos1200s_1.csv", skiprows=1, delimiter=',', usecols=(1, 2, 3)),
+           np.loadtxt(path + "LEO-XYZ-Pos1200s_2.csv", skiprows=1, delimiter=',', usecols=(1, 2, 3)),
+           np.loadtxt(path + "LEO-XYZ-Pos1200s_3.csv", skiprows=1, delimiter=',', usecols=(1, 2, 3))]
 # WHERE:
 # leo_pos[i,j]:
 # i --> the step time in sat pass
@@ -175,6 +176,7 @@ def simulate_scenario(nrNodes, sim_type):
 
     def transmit_eb(env: simpy.Environment, node: Node, sat: int, random: random.Random):
         # while nodes[node.nodeid].buffer > 0.0:
+        packet_number =0
         while node.buffer[sat] > 0.0:
             # STARTS TRANSMISSION AS DR84
             node.dr = 8
@@ -226,8 +228,8 @@ def simulate_scenario(nrNodes, sim_type):
                     # MAX_wait = 90 (considera tempo de propagação)
                     # AQUI TRANSMITIU, APÓS O WAIT TIME !!!!!! wait time considera o tempo de propagação, e por isso devem ser feitas simulações separadas para cada satélite
                     yield env.timeout(wait)
-                    logs[sat].append("trysend {} ==> {:3.3f}".format(node.nodeid,env.now))
-
+                    # logs[sat].append("trysend {} ==> {:3.3f}".format(node.nodeid,env.now))
+                    packet_number+=1
                     yield env.timeout(distance[node.nodeid % len(distance), sat, math.ceil(env.now)]*(1/299792.458))
 
                     trySend = True
@@ -330,41 +332,41 @@ def simulate_scenario(nrNodes, sim_type):
             if trySend == 1:
                 # print ("----count intra-packet collided", node.intraPacket.collided)
                 if node.header.lost[sat] or node.intraPacket.lost[sat]:
-                    logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PL,#{},#{},#{},#{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
-                        env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat]))
+                    logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PL,#{},#{},#{},#{},{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
+                        env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat], packet_number))
                 else:
                     if node.dr == 8 or node.dr == 10:
                         if node.header.collided[sat] == 3:
-                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PCh,#{},#{},#{},#{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
-                                env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat]))
+                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PCh,#{},#{},#{},#{},{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
+                                env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat], packet_number))
                         elif node.intraPacket.collided[sat] > (1/3)*nIntraPackets:
-                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PCp,#{},#{},#{},#{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
-                                env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat]))
+                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PCp,#{},#{},#{},#{},{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
+                                env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat], packet_number))
                         elif node.header.noProcessed[sat] == 3:
-                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},NP,#{},#{},#{},#{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
-                                env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat]))
+                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},NP,#{},#{},#{},#{},{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
+                                env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat], packet_number))
                         elif node.intraPacket.noProcessed[sat] > (1/3)*nIntraPackets:
-                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},NP,#{},#{},#{},#{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
-                                env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat]))
+                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},NP,#{},#{},#{},#{},{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
+                                env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat], packet_number))
                         else:
-                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PE,#{},#{},#{},#{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
-                                env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat]))
+                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PE,#{},#{},#{},#{},{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
+                                env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat], packet_number))
 
                     elif node.dr == 9 or node.dr == 11:
                         if node.header.collided[sat] == 2:
-                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PCh,#{},#{},#{},#{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
-                                env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat]))
+                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PCh,#{},#{},#{},#{},{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
+                                env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat], packet_number))
                         elif node.intraPacket.collided[sat] > (2/3)*nIntraPackets:
-                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PCp,#{},#{},#{},#{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
-                                env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat]))
+                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PCp,#{},#{},#{},#{},{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
+                                env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat], packet_number))
                         elif node.header.noProcessed[sat] == 2:
-                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},NP,#{},#{},#{},#{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
-                                env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat]))
+                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},NP,#{},#{},#{},#{},{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
+                                env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat], packet_number))
                         elif node.intraPacket.noProcessed[sat] > (2/3)*nIntraPackets:
-                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},NP,#{},#{},#{},#{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
-                                env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat]))
+                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},NP,#{},#{},#{},#{},{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
+                                env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat], packet_number))
                         else:
-                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PE,#{},#{},#{},#{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
+                            logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PE,#{},#{},#{},#{},{}".format(env.now, node.nodeid, distance[node.nodeid % len(distance)][sat, math.ceil(
                                 env.now)], 0, node.dr, nIntraPackets, node.intraPacket.noCollided[sat], len(node.header.freqHopHeader[sat]), node.header.noCollided[sat]))
 
             # RESET
@@ -443,14 +445,14 @@ def simulate_scenario(nrNodes, sim_type):
         # elif sim_type == 'et':
         #     env.process(transmit_et(env, node))
 
-        env.run(until=600*4)
+        env.run(until=1199)
 
         folder = '../resultados/'+sim_type+'_3CH_s' + \
             str(RANDOM_SEED)+'_p'+str(packetsToSend)+"_NOVO"
         if not os.path.exists(folder):
             os.makedirs(folder)
         fname = "./"+folder+"/" + str(sim_type+"_"+str(nrNodes)+"_3CH_"+str(
-            maxBSReceives)+"_s"+str(RANDOM_SEED)+"_p"+str(packetsToSend)) + "SAT"+str(sat) + ".csv"
+            maxBSReceives)+"_s"+str(RANDOM_SEED)+"_p"+str(packetsToSend)) + "SAT"+str(sat)+'1_10Pcts' + ".csv"
         with open(fname, "w") as myfile:
             myfile.write("\n".join(logs[sat]))
         myfile.close()

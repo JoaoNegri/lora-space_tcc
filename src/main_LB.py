@@ -15,10 +15,10 @@ mode_debbug = 0
 beacon_rec = 0
 max_rec = 15
 
-# if not mode_debbug:
-#     null = open(os.devnull, 'w')
-#     old_stdout = sys.stdout
-#     sys.stdout = null
+if not mode_debbug:
+    null = open(os.devnull, 'w')
+    old_stdout = sys.stdout
+    sys.stdout = null
 ### WE START BY USING SF=12 ADN BW=125 AND CR=1, FOR ALL NODES AND ALL TRANSMISIONS######
 
 if mode_debbug:
@@ -101,8 +101,9 @@ path = "../params/wider_scenario_2/"
 
 ### -137dB IS THE MINIMUN TOLERABLE SENSIBILITY, FOR SF=12 AND BW=125KHz ###
 
-leo_pos = [np.loadtxt(path + "LEO-XYZ-Pos_sat1.csv", skiprows=1, delimiter=',', usecols=(1, 2, 3)),
-           np.loadtxt(path + "LEO-XYZ-Pos_sat2.csv", skiprows=1, delimiter=',', usecols=(1, 2, 3))]
+leo_pos = [np.loadtxt(path + "LEO-XYZ-Pos1200s_1.csv", skiprows=1, delimiter=',', usecols=(1, 2, 3)),
+           np.loadtxt(path + "LEO-XYZ-Pos1200s_2.csv", skiprows=1, delimiter=',', usecols=(1, 2, 3)),
+           np.loadtxt(path + "LEO-XYZ-Pos1200s_3.csv", skiprows=1, delimiter=',', usecols=(1, 2, 3))]
 # WHERE:
 # leo_pos[i,j]:
 # i --> the step time in sat pass
@@ -175,6 +176,7 @@ def simulate_scenario(nrNodes, sim_type):
 
     def transmit_lb(env: simpy.Environment, node: Node, sat: int, random: random.Random):
         # while nodes[node.nodeid].buffer > 0.0:
+        num_packet = 0
         while node.buffer[sat] > 0.0:
             time = distance[node.nodeid % len(
                 distance), :, math.ceil(env.now)]*(1/299792.458)
@@ -206,7 +208,8 @@ def simulate_scenario(nrNodes, sim_type):
                     nodesToSend[0].append(node.nodeid)
                     wait = random.uniform(2, back_off) - node.packet.rectime
                     yield env.timeout(wait)
-                    logs[sat].append("trysend {} ==> {:3.3f}".format(node.nodeid,env.now))
+                    num_packet+= 1
+                    # logs[sat].append("trysend {} ==> {:3.3f}".format(node.nodeid,env.now))
                     print ("{:3.5f} || Node {} begins to transmit a packet".format(env.now,node.nodeid))
                     
                     yield env.timeout(distance[node.nodeid % len(distance), sat, math.ceil(env.now)]*(1/299792.458))
@@ -241,14 +244,14 @@ def simulate_scenario(nrNodes, sim_type):
                 if node.packet.lost[sat]:
                     print ("{:3.5f} || Node {} ended to transmit a packet".format(env.now,node.nodeid))
 
-                    logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PL,{}".format(env.now,node.nodeid,distance[node.nodeid % len(distance)][sat, math.ceil(env.now)],0,node.packet.sf,node.buffer[sat]/20))
+                    logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PL,{},{}".format(env.now,node.nodeid,distance[node.nodeid % len(distance)][sat, math.ceil(env.now)],0,node.packet.sf,node.buffer[sat]/20, num_packet))
                 elif node.packet.collided[sat]:
-                    logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PC,{}".format(env.now,node.nodeid,distance[node.nodeid % len(distance)][sat, math.ceil(env.now)],0,node.packet.sf,node.buffer[sat]/20))
+                    logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PC,{},{}".format(env.now,node.nodeid,distance[node.nodeid % len(distance)][sat, math.ceil(env.now)],0,node.packet.sf,node.buffer[sat]/20, num_packet))
                 elif node.packet.processed[sat] == 0:
-                    logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},NP,{}".format(env.now,node.nodeid,distance[node.nodeid % len(distance)][sat, math.ceil(env.now)],0,node.packet.sf,node.buffer[sat]/20))
+                    logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},NP,{},{}".format(env.now,node.nodeid,distance[node.nodeid % len(distance)][sat, math.ceil(env.now)],0,node.packet.sf,node.buffer[sat]/20, num_packet))
                 else:
                     print ("{:3.5f} || Node {} ended to transmit a packet".format(env.now,node.nodeid))
-                    logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PE,{}".format(env.now,node.nodeid,distance[node.nodeid % len(distance)][sat, math.ceil(env.now)],0,node.packet.sf,node.buffer[sat]/20))
+                    logs[sat].append("{:3.3f},{},{:3.3f},{:3.3f},{},PE,{},{}".format(env.now,node.nodeid,distance[node.nodeid % len(distance)][sat, math.ceil(env.now)],0,node.packet.sf,node.buffer[sat]/20, num_packet))
             
             # complete packet has been received by base station
             # Let's remove from Base Station
@@ -305,7 +308,7 @@ def simulate_scenario(nrNodes, sim_type):
                 env.process(transmit_lb(env, nodes[i], sat, randons[sat]))
 
 
-        env.run(until=600*4)
+        env.run(until=1199)
 
         folder = '../resultados/'+sim_type+'_3CH_s' + \
             str(RANDOM_SEED)+'_p'+str(packetsToSend)+"_NOVO"
