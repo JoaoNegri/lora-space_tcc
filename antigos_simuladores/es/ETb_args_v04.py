@@ -119,11 +119,11 @@ sensi = np.array([sf7,sf8,sf9,sf10,sf11,sf12])
 DR = [-137,-134.5,-134,-131.5]
 
 ## READ PARAMS FROM DIRECTORY ##
-path = "./wider_scenario_2/"
+path = "../params/wider_scenario_2/"
 
 ### -137dB IS THE MINIMUN TOLERABLE SENSIBILITY, FOR SF=12 AND BW=125KHz ###
 
-leo_pos=np.loadtxt( path + "LEO-XYZ-Pos.csv",skiprows=1,delimiter=',',usecols=(1,2,3))
+leo_pos=np.loadtxt(path + "LEO-XYZ-Pos1200s_3.csv", skiprows=1, delimiter=',', usecols=(1, 2, 3))
 ## WHERE:
     ## leo_pos[i,j]:
         ## i --> the step time in sat pass
@@ -794,7 +794,7 @@ def simulate_scenario (nrNodes):
         nodes.append(node)
         env.process(transmit(env,node))
         
-    env.run(until=600*2)
+    env.run(until=1199)
     
     sent = sum(n.sent for n in nodes)
     return ([sent,nrCollFullPacket,None,None,nrReceived],logs)

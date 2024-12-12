@@ -211,7 +211,7 @@ def simulate_scenario(nrNodes, sim_type):
                 max_prx = aux_prx.argmax()
 
                 # caso nem o satélite mais próximo não seja capaz de receber (teoricamente),  não envia
-                if aux_prx[max_prx] < sensibility:
+                if  [max_prx] < sensibility:
 
                     wait = 0  # LETS WAIT FOR NEXT BEACON
                     # define todos os itens como falso
@@ -230,7 +230,9 @@ def simulate_scenario(nrNodes, sim_type):
                     yield env.timeout(wait)
                     # logs[sat].append("trysend {} ==> {:3.3f}".format(node.nodeid,env.now))
                     packet_number+=1
-                    yield env.timeout(distance[node.nodeid % len(distance), sat, math.ceil(env.now)]*(1/299792.458))
+                    prop_time = distance[node.nodeid % len(distance), sat, math.ceil(env.now)]*(1/299792.458)
+
+                    yield env.timeout(prop_time)
 
                     trySend = True
                     node.sent = node.sent + 1
@@ -394,7 +396,7 @@ def simulate_scenario(nrNodes, sim_type):
                 # print ("NODE HEADER TIME",node.header.rectime)
                 # print ("ONE INTRA-PACKET TIMEE",node.intraPacket.rectime)
                 # yield env.timeout(beacon_time-wait)
-                yield env.timeout(beacon_time-wait-2*3*node.header.rectime-2*nIntraPackets*node.intraPacket.rectime - distance[node.nodeid % len(distance), sat, math.ceil(env.now)]*(1/299792.458))
+                yield env.timeout(beacon_time-wait-2*3*node.header.rectime-2*nIntraPackets*node.intraPacket.rectime - prop_time)
             else:
                 nIntraPackets = 0
                 yield env.timeout(beacon_time-wait-3*node.header.rectime-nIntraPackets*node.intraPacket.rectime)
@@ -452,7 +454,7 @@ def simulate_scenario(nrNodes, sim_type):
         if not os.path.exists(folder):
             os.makedirs(folder)
         fname = "./"+folder+"/" + str(sim_type+"_"+str(nrNodes)+"_3CH_"+str(
-            maxBSReceives)+"_s"+str(RANDOM_SEED)+"_p"+str(packetsToSend)) + "SAT"+str(sat)+'1_10Pcts' + ".csv"
+            maxBSReceives)+"_s"+str(RANDOM_SEED)+"_p"+str(packetsToSend)) + "SAT"+str(sat+1) + ".csv"
         with open(fname, "w") as myfile:
             myfile.write("\n".join(logs[sat]))
         myfile.close()

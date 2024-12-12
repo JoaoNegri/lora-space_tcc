@@ -101,9 +101,11 @@ path = "../params/wider_scenario_2/"
 
 ### -137dB IS THE MINIMUN TOLERABLE SENSIBILITY, FOR SF=12 AND BW=125KHz ###
 
-leo_pos = [np.loadtxt(path + "LEO-XYZ-Pos1200s_1.csv", skiprows=1, delimiter=',', usecols=(1, 2, 3)),
-           np.loadtxt(path + "LEO-XYZ-Pos1200s_2.csv", skiprows=1, delimiter=',', usecols=(1, 2, 3)),
-           np.loadtxt(path + "LEO-XYZ-Pos1200s_3.csv", skiprows=1, delimiter=',', usecols=(1, 2, 3))]
+# leo_pos = [np.loadtxt(path + "LEO-XYZ-Pos1200s_1.csv", skiprows=1, delimiter=',', usecols=(1, 2, 3)),
+#            np.loadtxt(path + "LEO-XYZ-Pos1200s_2.csv", skiprows=1, delimiter=',', usecols=(1, 2, 3)),
+#            np.loadtxt(path + "LEO-XYZ-Pos1200s_3.csv", skiprows=1, delimiter=',', usecols=(1, 2, 3))]
+
+leo_pos = [np.loadtxt(path + "LEO-XYZ-Pos1200s_3.csv", skiprows=1, delimiter=',', usecols=(1, 2, 3))]
 # WHERE:
 # leo_pos[i,j]:
 # i --> the step time in sat pass
@@ -211,8 +213,9 @@ def simulate_scenario(nrNodes, sim_type):
                     num_packet+= 1
                     # logs[sat].append("trysend {} ==> {:3.3f}".format(node.nodeid,env.now))
                     print ("{:3.5f} || Node {} begins to transmit a packet".format(env.now,node.nodeid))
-                    
-                    yield env.timeout(distance[node.nodeid % len(distance), sat, math.ceil(env.now)]*(1/299792.458))
+                    #timeout de tempo de propagação para o satélite específico
+                    prop_time = distance[node.nodeid % len(distance), sat, math.ceil(env.now)]*(1/299792.458)
+                    yield env.timeout(prop_time)
 
                     trySend = True
                     node.sent = node.sent + 1
@@ -266,7 +269,7 @@ def simulate_scenario(nrNodes, sim_type):
 
             if trySend:
                 print('will wait now :', beacon_time-wait-2*node.packet.rectime  )
-                yield env.timeout(beacon_time-wait-(2*node.packet.rectime)- distance[node.nodeid % len(distance), sat, math.ceil(env.now)]*(1/299792.458))
+                yield env.timeout(beacon_time-wait- 2*node.packet.rectime - prop_time)
             else:
                 # print(node.nodeid)
                 # print(env.now)
@@ -315,7 +318,7 @@ def simulate_scenario(nrNodes, sim_type):
         if not os.path.exists(folder):
             os.makedirs(folder)
         fname = "./"+folder+"/" + str(sim_type+"_"+str(nrNodes)+"_3CH_"+str(
-            maxBSReceives)+"_s"+str(RANDOM_SEED)+"_p"+str(packetsToSend)) + "SAT"+str(sat) + ".csv"
+            maxBSReceives)+"_s"+str(RANDOM_SEED)+"_p"+str(packetsToSend)) + "sat_"+str(sat+1) + ".csv"
         with open(fname, "w") as myfile:
             myfile.write("\n".join(logs[sat]))
         myfile.close()

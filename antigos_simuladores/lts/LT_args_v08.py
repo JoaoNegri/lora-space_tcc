@@ -106,7 +106,7 @@ sf12 = np.array([12,-137,-134,-131.0])
 
 sensi = np.array([sf7,sf8,sf9,sf10,sf11,sf12])
 
-path = "./wider_scenario_2/"
+path = "../params/wider_scenario_2/"
 
 ### -137dB IS THE MINIMUN TOLERABLE SENSIBILITY, FOR SF=12 AND BW=125KHz ###
 
@@ -553,7 +553,7 @@ def simulate_scenario (nrNodes):
         nodes.append(node)
         env.process(transmit(env,node))
         
-    env.run(until=600*2)
+    env.run(until=1199)
     
     sent = sum(n.sent for n in nodes)
     print('-------------',sent,nrCollisions,nrLost,nrProcessed,nrReceived)

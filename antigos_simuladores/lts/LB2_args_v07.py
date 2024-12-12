@@ -61,7 +61,6 @@ else:
     
     multi_nodes = [int(sys.argv[7]), int(sys.argv[8]) ,int(sys.argv[9]), int(sys.argv[10]),int(sys.argv[11]),int(sys.argv[12]),int(sys.argv[13]),int(sys.argv[14]),int(sys.argv[15]),int(sys.argv[16]),int(sys.argv[17]),int(sys.argv[18]),int(sys.argv[19]),int(sys.argv[20])]
 
-
 random.seed(RANDOM_SEED) #RANDOM SEED IS FOR GENERATE ALWAYS THE SAME RANDOM NUMBERS (ie SAME RESULTS OF SIMULATION)
 nodesToSend = []
 packetsToSend = math.ceil(total_data/packetlen)
@@ -108,10 +107,10 @@ sf12 = np.array([12,-137,-134,-131.0])
 sensi = np.array([sf7,sf8,sf9,sf10,sf11,sf12])
 
 ## READ PARAMS FROM DIRECTORY ##
-path = "./wider_scenario_2/"
-
+path = "../params/wider_scenario_2/"
 
 leo_pos=np.loadtxt( path + "LEO-XYZ-Pos.csv",skiprows=1,delimiter=',',usecols=(1,2,3))
+
 ## WHERE:
     ## leo_pos[i,j]:
         ## i --> the step time in sat pass
@@ -435,6 +434,8 @@ def simulate_scenario (nrNodes):
         global beacon_time
         global logs
         global nodesToSend
+        num_packet = 0
+
         while node.buffer > 0.0:
             yield env.timeout(node.packet.rectime + float(node.packet.proptime[math.ceil(env.now)])) ##GIVE TIME TO RECEIVE BEACON
                           
@@ -456,6 +457,7 @@ def simulate_scenario (nrNodes):
                     
                     print ("{:3.5f} || Node {} begins to transmit a packet".format(env.now,node.nodeid))
                     trySend = True
+                    num_packet += 1
                     node.sent = node.sent + 1
                     node.buffer = node.buffer - node.packetlen
                     if node in packetsAtBS:
@@ -481,13 +483,13 @@ def simulate_scenario (nrNodes):
             
             if trySend == 1:
                 if node.packet.lost:
-                    logs.append("{:3.3f},{},{:3.3f},{:3.3f},{},PL".format(env.now,node.nodeid,node.dist[math.ceil(env.now)],node.elev[math.ceil(env.now)],node.packet.sf))
+                    logs.append("{:3.3f},{},{:3.3f},{:3.3f},{},{},PL".format(env.now,node.nodeid,node.dist[math.ceil(env.now)],node.elev[math.ceil(env.now)],node.packet.sf, num_packet))
                 elif node.packet.collided:
-                    logs.append("{:3.3f},{},{:3.3f},{:3.3f},{},PC".format(env.now,node.nodeid,node.dist[math.ceil(env.now)],node.elev[math.ceil(env.now)],node.packet.sf))
+                    logs.append("{:3.3f},{},{:3.3f},{:3.3f},{},{},PC".format(env.now,node.nodeid,node.dist[math.ceil(env.now)],node.elev[math.ceil(env.now)],node.packet.sf, num_packet))
                 elif node.packet.processed == 0:
-                    logs.append("{:3.3f},{},{:3.3f},{:3.3f},{},NP".format(env.now,node.nodeid,node.dist[math.ceil(env.now)],node.elev[math.ceil(env.now)],node.packet.sf))
+                    logs.append("{:3.3f},{},{:3.3f},{:3.3f},{},{},NP".format(env.now,node.nodeid,node.dist[math.ceil(env.now)],node.elev[math.ceil(env.now)],node.packet.sf, num_packet))
                 else:
-                    logs.append("{:3.3f},{},{:3.3f},{:3.3f},{},PE".format(env.now,node.nodeid,node.dist[math.ceil(env.now)],node.elev[math.ceil(env.now)],node.packet.sf))
+                    logs.append("{:3.3f},{},{:3.3f},{:3.3f},{},{},PE".format(env.now,node.nodeid,node.dist[math.ceil(env.now)],node.elev[math.ceil(env.now)],node.packet.sf, num_packet))
             
             
             # complete packet has been received by base station

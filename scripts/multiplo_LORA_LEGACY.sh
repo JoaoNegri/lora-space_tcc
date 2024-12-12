@@ -40,13 +40,14 @@ do
     numero_aleatorio=$(shuf -i 1-10000 -n 1)
     chan=3
     packetlen=20   ##NODES SEND PACKETS OF JUST 20 Bytes
-    total_data=$(echo "220 240 260 280 300 320 340 360 380 400" | tr " " "\n" | shuf -n 1) ##TOTAL DATA ON BUFFER, FOR EACH NODE (IT'S THE BUFFER O DATA BEFORE START SENDING)
+    total_data=$(echo "20 40 60 80 100 120 140 160 180 200" | tr " " "\n" | shuf -n 1) 
+    # total_data=60
     beacon_time=120 ###SAT SENDS BEACON EVERY CERTAIN TIME
     maxBSReceives=16 ##MAX NUMBER OF PACKETS THAT BS (ie SATELLITE) CAN RECEIVE AT SAME TIME
     pskip=100000
     echo "Executando o item: $valor"
     echo "-----------------------------------------"
-    echo ../src/main.py "$numero_aleatorio" "$chan" "$packetlen" "$total_data" "$beacon_time" "$maxBSReceives" 5 10 50 100 200 500 750 1000 5000 10000 25000 50000 100000 150000 "$pskip" "$valor"
+    echo ../src/main.py "$numero_aleatorio" "$chan" "$packetlen" "$total_data" "$beacon_time" "$maxBSReceives"  5 10 50 100 200 500 750 1000 1250 1500 2000 2250 2500 3000 "$pskip" "$valor"
     python3 ../src/main_LB.py "$numero_aleatorio" "$chan" "$packetlen" "$total_data" "$beacon_time" "$maxBSReceives" 5 10 50 100 200 500 750 1000 1250 1500 2000 2250 2500 3000 "$pskip" "$valor"
     echo "O número aleatório gerado é: $numero_aleatorio"
 done

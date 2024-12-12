@@ -31,7 +31,7 @@ if [ ! -d "$diretorio" ]; then
     echo "O diretório especificado não existe."
     exit 1
 fi
-n=2
+n=5
 # Loop para percorrer todos os arquivos Python no diretório
 
 
@@ -47,7 +47,7 @@ do
     echo "Executando o item: $valor"
     echo "-----------------------------------------"
     echo ../src/main.py "$numero_aleatorio" "$chan" "$packetlen" "$total_data" "$beacon_time" "$maxBSReceives" 5 10 50 100 200 500 750 1000 5000 10000 25000 50000 100000 150000 "$pskip" "$valor"
-    python3 ../src/main.py "$numero_aleatorio" "$chan" "$packetlen" "$total_data" "$beacon_time" "$maxBSReceives" 5 10 50 100 200 500 750 1000 5000 10000 25000 50000 100000 150000 "$pskip" "$valor"
+    python3 ../src/main.py "$numero_aleatorio" "$chan" "$packetlen" "$total_data" "$beacon_time" "$maxBSReceives" 5 10 50 100 200 500 750 1000 1250 1500 2000 2250 2500 3000 "$pskip" "$valor"
     echo "-----------------------------------------"
     echo "O número aleatório gerado é: $numero_aleatorio"
 done
