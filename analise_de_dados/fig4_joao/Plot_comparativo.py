@@ -1,3 +1,4 @@
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
@@ -11,37 +12,37 @@ import numpy as np
 # plt.style.use('ieee')
 
 
-folders = os.listdir('../../resultados/teste_lrfhss_original_plot_antigo/')
+folders = os.listdir('../../resultados/sat3/')
 
 dfs =[]
 
 # cada tipo de simulador
 for folder in folders:
 
-    iteracao = os.listdir('../../resultados/teste_lrfhss_original_plot_antigo/'+folder)
+    iteracao = os.listdir('../../resultados/sat3/'+folder)
     node = []
     percentual = []
     i=0
     df = pd.DataFrame
     # cada parametro de simulaçao
     for it in iteracao:
-        files = os.listdir('../../resultados/teste_lrfhss_original_plot_antigo/'+folder+'/'+it)
+        files = os.listdir('../../resultados/sat3/'+folder+'/'+it)
         #cada simulação
         for file in files:
             print(file)
-            sim = pd.read_csv('../../resultados/teste_lrfhss_original_plot_antigo/'+folder+'/'+it+'/'+file, names=['timestamp','id','dist','elev','SF','status','a','b','c','d','num'])
-            sim = sim[sim['timestamp'] <= 1200]
+            sim = pd.read_csv('../../resultados/sat3/'+folder+'/'+it+'/'+file, names=['timestamp','id','dist','elev','SF','num','status','a','b','c','d'])
             node.append(int(file.split('_')[1]))
             processed = len(sim[sim['status']=='PE']) # mensagens recebidas com sucesso
             num_packet = len(sim['status']) # Total de transmissão
 
             percentual.append(processed/num_packet)
-            print(len(percentual))
+            print(num_packet)
+            print(processed)
 
         if df.empty:
-            data = {'num_nodes'+'EB'+'0' : node, 'percentual'+"EB"+'0' : percentual}
+            data = {'num_nodes'+'LB'+'0' : node, 'percentual'+"LB"+'0' : percentual}
             df = pd.DataFrame(data)
-            df = df.sort_values('num_nodes'+'EB'+'0')
+            df = df.sort_values('num_nodes'+'LB'+'0')
             print(node)
             print(percentual)
             print(len(node))
@@ -72,14 +73,15 @@ for item in dfs:
 
     desvio_padrao_por_linha = item[colunas_percentual].std(axis=1) #axis 1 pq faz o desvio padrão da linha que contém todas as simulações no mesmo simulador com o mesmo número de end devices
     media = item[colunas_percentual].mean(axis=1)
+    print(item[colunas_percentual])
     print(colunas_percentual)
     print(colunas_num_nodes)
-    print(len(item['percentualEB0']))
+    print(len(item['percentualLB0']))
     soma = 2.45*(desvio_padrao_por_linha/np.sqrt(30)) #intervalo de confiança
 
     
 
-    if 'percentualEB0'  in item.columns:
+    if 'percentualLB0'  in item.columns:
         label = 'lora conservative'
         plt.plot(item[colunas_num_nodes[0]],media, label=label)
         plt.fill_between(item[colunas_num_nodes[0]], media-soma, media+soma, alpha=0.3)
@@ -90,7 +92,7 @@ for item in dfs:
 plt.legend()
 plt.yticks([1,0.6,0.4,0.3,0.2])
 plt.ylim(0.17,1)
-plt.xlim(0,150e3)
+plt.xlim(0,3e3)
 plt.yscale("log")
 plt.grid(True,axis='both')
 plt.show()

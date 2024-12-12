@@ -12,14 +12,14 @@ import numpy as np
 # plt.style.use('science')
 
 
-folders = os.listdir('../aaaa')
+folders = os.listdir('../../resultados/simulacao_completa_lt_pra_plot_inicial')
 
 dfs =[]
 
 # cada tipo de simulador
 for folder in folders:
 
-    iteracao = os.listdir('../aaaa/'+folder)
+    iteracao = os.listdir('../../resultados/simulacao_completa_lt_pra_plot_inicial/'+folder)
     node = []
     percentual = []
 
@@ -33,10 +33,10 @@ for folder in folders:
     df = pd.DataFrame
     # cada parametro de simulaçao
     for it in iteracao:
-        files = os.listdir('../aaaa/'+folder+'/'+it)
+        files = os.listdir('../../resultados/simulacao_completa_lt_pra_plot_inicial/'+folder+'/'+it)
         #cada simulação
         for file in files:
-            sim = pd.read_csv('../aaaa/'+folder+'/'+it+'/'+file, names=['timestamp','id','dist','elev','SF','status'])
+            sim = pd.read_csv('../../resultados/simulacao_completa_lt_pra_plot_inicial/'+folder+'/'+it+'/'+file, names=['timestamp','id','dist','elev','SF','status'])
 
             node.append(int(file.split('_')[1]))
 
@@ -121,101 +121,108 @@ for item in dfs:
         pass
 
 
-    soma = 12.71*(desvio_padrao_por_linha/np.sqrt(30)) #intervalo de confiança
+    soma = 1.97*(desvio_padrao_por_linha/np.sqrt(30)) #intervalo de confiança
 
 
     if 'percentualLB12'  in item.columns:
         label = 'lora conservative'
-        plt.subplot(211)
+        # plt.subplot(211)
         plt.plot(item[colunas_num_nodes[0]],media, label=label)
         plt.fill_between(item[colunas_num_nodes[0]], media-soma, media+soma, alpha=0.3)
-        plt.subplot(627)
-        plt.title(label)
-        plt.plot(item[colunas_num_nodes[0]],media_num_packet, c='grey', ls='--')
-        plt.plot(item[colunas_num_nodes[0]],media_collided, c='r', ls='--')
-        plt.plot(item[colunas_num_nodes[0]],media_lost, c='b', ls='--')
-        plt.plot(item[colunas_num_nodes[0]],media_processed, c='orange')
-        plt.fill_between(item[colunas_num_nodes[0]],media_processed,0, color='orange', alpha=0.3)
-        plt.ylim(0, 3000)
+        # plt.subplot(627)
+        # plt.title(label)
+        # plt.plot(item[colunas_num_nodes[0]],media_num_packet, c='grey', ls='--')
+        # plt.plot(item[colunas_num_nodes[0]],media_collided, c='r', ls='--')
+        # plt.plot(item[colunas_num_nodes[0]],media_lost, c='b', ls='--')
+        # plt.plot(item[colunas_num_nodes[0]],media_processed, c='orange')
+        # plt.fill_between(item[colunas_num_nodes[0]],media_processed,0, color='orange', alpha=0.3)
+        # plt.ylim(0, 3000)
 
 
     elif 'percentualLR12' in item.columns:
         label = 'lora random'
-        plt.subplot(211)
+      # plt.subplot(211)
         plt.plot(item[colunas_num_nodes[0]],media, label=label)
         plt.fill_between(item[colunas_num_nodes[0]], media-soma, media+soma, alpha=0.3)
-        plt.subplot(628)
-        plt.title(label)
-        plt.plot(item[colunas_num_nodes[0]],media_num_packet, c='grey', ls='--')
-        plt.plot(item[colunas_num_nodes[0]],media_collided, c='r', ls='--')
-        plt.plot(item[colunas_num_nodes[0]],media_lost, c='b', ls='--')
-        plt.plot(item[colunas_num_nodes[0]],media_processed, c='orange')
-        plt.fill_between(item[colunas_num_nodes[0]],media_processed,0, color='orange', alpha=0.3)
-        plt.ylim(0, 3000)
+        # plt.subplot(628)
+        # plt.title(label)
+        # plt.plot(item[colunas_num_nodes[0]],media_num_packet, c='grey', ls='--')
+        # plt.plot(item[colunas_num_nodes[0]],media_collided, c='r', ls='--')
+        # plt.plot(item[colunas_num_nodes[0]],media_lost, c='b', ls='--')
+        # plt.plot(item[colunas_num_nodes[0]],media_processed, c='orange')
+        # plt.fill_between(item[colunas_num_nodes[0]],media_processed,0, color='orange', alpha=0.3)
+        # plt.ylim(0, 3000)
 
     elif 'percentualLT12'  in item.columns:
         label = 'lora trajectory'
-        plt.subplot(211)
+      # plt.subplot(211)
         plt.plot(item[colunas_num_nodes[0]],media, label=label)
         plt.fill_between(item[colunas_num_nodes[0]], media-soma, media+soma, alpha=0.3)
-        plt.subplot(629)
-        plt.title(label)
-        plt.plot(item[colunas_num_nodes[0]],media_num_packet, c='grey', ls='--')
-        plt.plot(item[colunas_num_nodes[0]],media_collided, c='r', ls='--')
-        plt.plot(item[colunas_num_nodes[0]],media_lost, c='b', ls='--')
-        plt.plot(item[colunas_num_nodes[0]],media_processed, c='orange')
-        plt.fill_between(item[colunas_num_nodes[0]],media_processed,0, color='orange', alpha=0.3)
-        plt.ylim(0, 3000)
+        # plt.subplot(629)
+        # plt.title(label)
+        # plt.plot(item[colunas_num_nodes[0]],media_num_packet, c='grey', ls='--')
+        # plt.plot(item[colunas_num_nodes[0]],media_collided, c='r', ls='--')
+        # plt.plot(item[colunas_num_nodes[0]],media_lost, c='b', ls='--')
+        # plt.plot(item[colunas_num_nodes[0]],media_processed, c='orange')
+        # plt.fill_between(item[colunas_num_nodes[0]],media_processed,0, color='orange', alpha=0.3)
+        # plt.ylim(0, 3000)
 
     elif 'percentualLTr12'  in item.columns:
         label = 'lora trajectory random'
-        plt.subplot(211)
+      # plt.subplot(211)
         plt.plot(item[colunas_num_nodes[0]],media, label=label)
         plt.fill_between(item[colunas_num_nodes[0]], media-soma, media+soma, alpha=0.3)
-        plt.subplot(6,2,10)
-        plt.title(label)
-        plt.plot(item[colunas_num_nodes[0]],media_num_packet, c='grey', ls='--')
-        plt.plot(item[colunas_num_nodes[0]],media_collided, c='r', ls='--')
-        plt.plot(item[colunas_num_nodes[0]],media_lost, c='b', ls='--')
-        plt.plot(item[colunas_num_nodes[0]],media_processed, c='orange')
-        plt.fill_between(item[colunas_num_nodes[0]],media_processed,0, color='orange', alpha=0.3)
-        plt.ylim(0, 3000)
+        # plt.subplot(6,2,10)
+        # plt.title(label)
+        # plt.plot(item[colunas_num_nodes[0]],media_num_packet, c='grey', ls='--')
+        # plt.plot(item[colunas_num_nodes[0]],media_collided, c='r', ls='--')
+        # plt.plot(item[colunas_num_nodes[0]],media_lost, c='b', ls='--')
+        # plt.plot(item[colunas_num_nodes[0]],media_processed, c='orange')
+        # plt.fill_between(item[colunas_num_nodes[0]],media_processed,0, color='orange', alpha=0.3)
+        # plt.ylim(0, 3000)
 
     elif 'percentualLTb12'  in item.columns:
         label = 'Trajectory skip'
-        plt.subplot(211)
+      # plt.subplot(211)
         plt.plot(item[colunas_num_nodes[0]],media, label=label)
         plt.fill_between(item[colunas_num_nodes[0]], media-soma, media+soma, alpha=0.3)
-        plt.subplot(6,2,11)
-        plt.title(label)
-        plt.plot(item[colunas_num_nodes[0]],media_num_packet, c='grey', ls='--')
-        plt.plot(item[colunas_num_nodes[0]],media_collided, c='r', ls='--')
-        plt.plot(item[colunas_num_nodes[0]],media_lost, c='b', ls='--')
-        plt.plot(item[colunas_num_nodes[0]],media_processed, c='orange')
-        plt.fill_between(item[colunas_num_nodes[0]],media_processed,0, color='orange', alpha=0.3)
-        plt.ylim(0, 3000)
+        # plt.subplot(6,2,11)
+        # plt.title(label)
+        # plt.plot(item[colunas_num_nodes[0]],media_num_packet, c='grey', ls='--')
+        # plt.plot(item[colunas_num_nodes[0]],media_collided, c='r', ls='--')
+        # plt.plot(item[colunas_num_nodes[0]],media_lost, c='b', ls='--')
+        # plt.plot(item[colunas_num_nodes[0]],media_processed, c='orange')
+        # plt.fill_between(item[colunas_num_nodes[0]],media_processed,0, color='orange', alpha=0.3)
+        # plt.ylim(0, 3000)
 
     elif 'percentualLTbr12'  in item.columns:
         label = 'lora trajectory random skip'
-        plt.subplot(211)
+      # plt.subplot(211)
         plt.plot(item[colunas_num_nodes[0]],media, label=label)
         plt.fill_between(item[colunas_num_nodes[0]], media-soma, media+soma, alpha=0.3)
-        plt.subplot(6,2,12)
-        plt.title(label)
-        plt.plot(item[colunas_num_nodes[0]],media_num_packet, c='grey', ls='--')
-        plt.plot(item[colunas_num_nodes[0]],media_collided, c='r', ls='--')
-        plt.plot(item[colunas_num_nodes[0]],media_lost, c='b', ls='--')
-        plt.plot(item[colunas_num_nodes[0]],media_processed, c='orange')
-        plt.fill_between(item[colunas_num_nodes[0]],media_processed,0, color='orange', alpha=0.3)
-        plt.ylim(0, 3000)
+        # plt.subplot(6,2,12)
+        # plt.title(label)
+        # plt.plot(item[colunas_num_nodes[0]],media_num_packet, c='grey', ls='--')
+        # plt.plot(item[colunas_num_nodes[0]],media_collided, c='r', ls='--')
+        # plt.plot(item[colunas_num_nodes[0]],media_lost, c='b', ls='--')
+        # plt.plot(item[colunas_num_nodes[0]],media_processed, c='orange')
+        # plt.fill_between(item[colunas_num_nodes[0]],media_processed,0, color='orange', alpha=0.3)
+        # plt.ylim(0, 3000)
     
     
-plt.subplot(211)
-plt.legend()
-plt.yticks([1,0.6,0.4,0.3,0.2])
+# plt.subplot(211)
+plt.title('Probabilidade de entrega de pacotes', fontsize=24)
+plt.xlabel('Número de end devices', fontsize=22)
+plt.ylabel('Probabilidade de recepção', fontsize=22)
+plt.xticks(fontsize=20)
+plt.legend(fontsize=20)
+
+# plt.yticks()
 plt.ylim(0.17,1)
 plt.xlim(0,3e3)
 plt.yscale("log")
+yticks = [1, 0.6, 0.4, 0.3, 0.2]
+plt.yticks(yticks, [str(y) for y in yticks], fontsize=20)
 plt.grid(True,axis='both')
 plt.subplots_adjust(hspace=0.5)
 plt.show()

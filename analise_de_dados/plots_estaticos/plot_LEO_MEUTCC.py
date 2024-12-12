@@ -11,10 +11,10 @@ leo_lla_df3 = pd.read_csv('../../params/wider_scenario_2/LEO-LLA-Pos copy 3.csv'
 sites_lla_df = pd.read_csv('../../params/wider_scenario_2/SITES-LLA-Pos.csv')
 
 # Create a new figure
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10), subplot_kw={'projection': ccrs.PlateCarree()})
+fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(20, 10), subplot_kw={'projection': ccrs.PlateCarree()})
 
 # Add features to the map (like coastlines and borders) to both subplots
-for ax in [ax1, ax2]:
+for ax in [ax1, ax2, ax3]:
     ax.add_feature(cfeature.COASTLINE)
     ax.add_feature(cfeature.BORDERS, linestyle=':')
     ax.gridlines(draw_labels=True)
@@ -69,7 +69,7 @@ ax1.legend(handles=legend_elements)
 
 ax1.set_ylim(-60, 20)
 ax1.set_xlim(-90, -40)
-ax1.set_title("Posições Iniciais")
+ax1.set_title("Posição Inicial")
 
 # Second subplot: last positions of each satellite
 ax2.scatter(leo_lla_df1['LON[deg]'][299], leo_lla_df1['LAT[deg]'][299], s=90, color='b', edgecolor='black', zorder=5, transform=ccrs.PlateCarree(), label='Satélite 1')
@@ -86,7 +86,18 @@ ax2.add_patch(circle3)
 
 ax2.set_ylim(-60, 20)
 ax2.set_xlim(-90, -40)
-ax2.set_title("Posições Finais")
-plt.savefig('../figuras/Caminho_satelites.png', bbox_inches='tight')
+ax2.set_title("Posição Intermediária")
+ax2.legend()
+
+ax3.scatter(leo_lla_df3['LON[deg]'][899], leo_lla_df3['LAT[deg]'][899], s=90, color='g', edgecolor='black', zorder=5, transform=ccrs.PlateCarree(), label='Satélite 3')
+
+circle3 = Circle((leo_lla_df3['LON[deg]'][899], leo_lla_df3['LAT[deg]'][899]), 20, edgecolor='g', facecolor='g', alpha=0.2, transform=ccrs.PlateCarree())
+
+ax3.add_patch(circle3)
+
+ax3.set_ylim(-60, 20)
+ax3.set_xlim(-90, -40)
+ax3.set_title("Posição Finais")
+# plt.savefig('../figuras/Caminho_satelites.png', bbox_inches='tight')
 plt.legend()
 plt.show()

@@ -2,9 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
-path = '../../resultados/simulacao_1_sat_legacy_3_pcts'
+path = '../../resultados/simulacao_completa_lt_pra_plot_inicial'
 
-tipos_simulacao = os.listdir('../../resultados/simulacao_1_sat_legacy_3_pcts')
+tipos_simulacao = os.listdir('../../resultados/simulacao_completa_lt_pra_plot_inicial')
 j = 0
 for tipo_simulacao in tipos_simulacao: #lb, lt...
     iteracoes = os.listdir(path+'/'+tipo_simulacao)
@@ -26,19 +26,19 @@ for tipo_simulacao in tipos_simulacao: #lb, lt...
 
 
     if 'LB'  == tipo_simulacao:
-        label = 'lora conservative'
+        label = 'Lora conservative'
 
 
     elif 'LR' == tipo_simulacao:
-        label = 'lora random'
+        label = 'Lora random'
 
 
     elif 'LT' == tipo_simulacao:
-        label = 'lora trajectory'
+        label = 'Lora trajectory'
 
 
     elif 'LTr' == tipo_simulacao:
-        label = 'lora trajectory random'
+        label = 'Lora trajectory random'
 
 
     elif 'LTb' == tipo_simulacao:
@@ -46,7 +46,7 @@ for tipo_simulacao in tipos_simulacao: #lb, lt...
 
 
     elif 'LTbr' == tipo_simulacao:
-        label = 'lora trajectory random skip'
+        label = 'Lora trajectory random skip'
 
     
     colors = {7: 'navy', 8: 'blue', 9: 'lightblue', 10: 'lightsalmon', 11: 'red', 12: 'darkred'}   
@@ -62,12 +62,12 @@ for tipo_simulacao in tipos_simulacao: #lb, lt...
 
 
     if j ==0:
-        plt.bar(label, df[0].iloc[0], label='7', color=colors[7])#, c=a.values)
-        plt.bar(label, df[0].iloc[1], label='8',bottom=df[0].iloc[0], color=colors[8])#, c=a.values)
-        plt.bar(label, df[0].iloc[2], label='9',bottom=df[0].iloc[0]+df[0].iloc[1], color=colors[9])#, c=a.values)
-        plt.bar(label, df[0].iloc[3], label='10',bottom=df[0].iloc[0]+df[0].iloc[1]+df[0].iloc[2], color=colors[10])#, c=a.values)
-        plt.bar(label, df[0].iloc[4], label='11',bottom=df[0].iloc[0]+df[0].iloc[1]+df[0].iloc[2]+df[0].iloc[3], color=colors[11])#, c=a.values)
-        plt.bar(label, df[0].iloc[5], label='12',bottom=df[0].iloc[0]+df[0].iloc[1]+df[0].iloc[2]+df[0].iloc[3]+df[0].iloc[4], color=colors[12])#, c=a.values)
+        plt.bar(label, df[0].iloc[0], label='SF 7', color=colors[7])#, c=a.values)
+        plt.bar(label, df[0].iloc[1], label='SF 8',bottom=df[0].iloc[0], color=colors[8])#, c=a.values)
+        plt.bar(label, df[0].iloc[2], label='SF 9',bottom=df[0].iloc[0]+df[0].iloc[1], color=colors[9])#, c=a.values)
+        plt.bar(label, df[0].iloc[3], label='SF 10',bottom=df[0].iloc[0]+df[0].iloc[1]+df[0].iloc[2], color=colors[10])#, c=a.values)
+        plt.bar(label, df[0].iloc[4], label='SF 11',bottom=df[0].iloc[0]+df[0].iloc[1]+df[0].iloc[2]+df[0].iloc[3], color=colors[11])#, c=a.values)
+        plt.bar(label, df[0].iloc[5], label='SF 12',bottom=df[0].iloc[0]+df[0].iloc[1]+df[0].iloc[2]+df[0].iloc[3]+df[0].iloc[4], color=colors[12])#, c=a.values)
     else:
         plt.bar(label, df[0].iloc[0], color=colors[7])#, c=a.values)
         plt.bar(label, df[0].iloc[1],bottom=df[0].iloc[0], color=colors[8])#, c=a.values)
@@ -76,5 +76,11 @@ for tipo_simulacao in tipos_simulacao: #lb, lt...
         plt.bar(label, df[0].iloc[4],bottom=df[0].iloc[0]+df[0].iloc[1]+df[0].iloc[2]+df[0].iloc[3], color=colors[11])#, c=a.values)
         plt.bar(label, df[0].iloc[5],bottom=df[0].iloc[0]+df[0].iloc[1]+df[0].iloc[2]+df[0].iloc[3]+df[0].iloc[4], color=colors[12])#, c=a.values)
     j+= 1
-plt.legend()
+plt.title('Tempo médio de transmissão', fontsize=24)
+plt.xlabel('Política de transmissão',fontsize=22)
+plt.ylabel('Tempo de transmissão (s)',fontsize=22)
+plt.legend(fontsize=20)
+plt.xticks(fontsize=20, rotation=-11)
+plt.yticks(fontsize=20)
 plt.show()
+
